@@ -40,7 +40,7 @@ Citizen.CreateThread(function()
         ExpandWorldLimits( -9000.0, -11000.0, 30.0 )  
         ExpandWorldLimits(10000.0, 12000.0, 30.0) 
     end 
-end 
+end)
  >> 
     --Citizen.CreateThread(function()
         --while true do 
@@ -50,7 +50,7 @@ end
                 ExpandWorldLimits(10000.0, 12000.0, 30.0) 
             end 
         --end 
-    --end 
+    --end )
     >> 
         expandWorldtasks = function() 
             ExpandWorldLimits( -9000.0, -11000.0, 30.0 )  
@@ -70,12 +70,55 @@ or
                 ExpandWorldLimits(10000.0, 12000.0, 30.0) 
             end,0)
         --end 
-    end 
+    end )
     >> 
         Citizen.CreateThread(function()
             Threads.loop(function() 
                 ExpandWorldLimits( -9000.0, -11000.0, 30.0 )  
                 ExpandWorldLimits(10000.0, 12000.0, 30.0) 
             end,0)
-        end 
+        end )
+```
+
+[HOW TO 2]
+```
+
+Citizen.CreateThread(function() --SOMEWHERE
+    while true do 
+        Citizen.Wait(500)
+        print("GAME TIME:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
+    end 
+end )
+Citizen.CreateThread(function() --SOMEWHERE2
+    while true do 
+        Citizen.Wait(500)
+        print("GAME TIME2:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
+    end 
+end )
+
+ >>
+    gametimetasks = function() --SOMEWHERE.lua
+        print("GAME TIME:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
+    end 
+    Citizen.CreateThread(function()
+            Threads.loop(gametimetasks,500)
+    end )
+    othertasks = function() --SOMEWHERE2.lua
+        print("GAME TIME2:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
+    end 
+    Citizen.CreateThread(function()
+            Threads.loop(othertasks,500)
+    end )
+    
+or 
+    gametimetasks = function() --SOMEWHERE.lua
+        print("GAME TIME:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
+    end 
+    othertasks = function() --SOMEWHERE.lua 
+        print("GAME TIME2:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
+    end 
+    Citizen.CreateThread(function() --LAST LINE OF SOMEWHERE.lua 
+        Threads.loop(gametimetasks,500)
+        Threads.loop(othertasks,500)
+    end )
 ```
