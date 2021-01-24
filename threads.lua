@@ -9,7 +9,8 @@ Threads = {}
 tasks = {}
 debuglog = true 
 
-Threads.loop = function(func,timer)
+Threads.loop = function(func,_timer)
+	local timer = _timer or 0
 	local actiontable = tasks[timer] or nil 
 	if not tasks[timer] then 
 		tasks[timer] = {}	
