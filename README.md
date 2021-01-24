@@ -6,7 +6,7 @@ Threads utilities for FXServer
 Set it as a dependency in you fxmanifest.lua
 
 ```
-server_script '@threads/threads.lua'
+client_script '@threads/threads.lua'
 ```
 
 [USAGE]
@@ -25,7 +25,7 @@ othertasks = function()
 	print("GAME TIME2:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
 end 
 
-CreateThread(function()
+Citizen.CreateThread(function()
     Threads.loop(expandWorldtasks,0)
     Threads.loop(gametimetasks,500)
     Threads.loop(othertasks,500)
