@@ -1,4 +1,4 @@
-# fxserver-async
+# fxserver-threads
 Threads utilities for FXServer
 
 [INSTALLATION]
