@@ -3,7 +3,7 @@ Threads utilities for FXServer
 
 [INSTALLATION]
 
-Set it as a dependency in you __resource.lua
+Set it as a dependency in you fxmanifest.lua
 
 ```
 server_script '@threads/threads.lua'
