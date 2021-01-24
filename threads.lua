@@ -10,6 +10,9 @@ tasks = {}
 debuglog = true 
 
 Threads.loop = function(func,_timer)
+	if debuglog and not _timer then 
+		print("[BAD Hobbits]Some Threads.loop timer is nil on "..GetCurrentResourceName())
+	end 
 	local timer = _timer or 0
 	local actiontable = tasks[timer] or nil 
 	if not tasks[timer] then 
