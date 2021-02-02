@@ -1,9 +1,3 @@
-if Citizen and Citizen.CreateThread then
-	CreateThread = Citizen.CreateThread
-end
-if Citizen and Citizen.Wait then
-	CWait = Citizen.Wait
-end
 
 Threads = {}
 tasks = {}
@@ -21,7 +15,7 @@ Threads.loop = function(func,_timer)
 		table.insert(actiontable,func)
 		CreateThread(function()
 			while true do
-				CWait(timer)
+				Wait(timer)
 				for i=1,#actiontable do 
 					actiontable[i]()
 				end 
@@ -30,16 +24,15 @@ Threads.loop = function(func,_timer)
 	else 
 		table.insert(actiontable,func)
 	end 
-	
-
 end
+
 
 
 --debug 
 if debuglog then 
 local thisname = "threads"
 
-Citizen.CreateThread(function()
+CreateThread(function()
 	if IsDuplicityVersion() then 
 
 		if GetCurrentResourceName() ~= thisname then 
@@ -48,7 +41,6 @@ Citizen.CreateThread(function()
 		
 		RegisterServerEvent(thisname..':log')
 		AddEventHandler(thisname..':log', function(strings,sourcename)
-			
 			print(strings.." player:"..GetPlayerName(source).." \n\x1B[32m[\x1B[33m"..thisname.."\x1B[32m]\x1B[33m"..GetResourcePath(sourcename)..'\x1B[0m')
 			
 		end)
