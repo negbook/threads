@@ -3,16 +3,19 @@ Threads = {}
 tasks = {}
 debuglog = true 
 
-Threads.loop = function(func,_timer)
+Threads.loop = function(func,_timer, _name)
 	if debuglog and not _timer then 
 		print("[BAD Hobbits]Some Threads.loop timer is nil on "..GetCurrentResourceName())
 	end 
 	local timer = _timer or 0
-	local actiontable = tasks[timer] or nil 
-	if not tasks[timer] then 
-		tasks[timer] = {}	
-		actiontable = tasks[timer]
+    local name = _name or 'default'
+    if not tasks[name] then tasks[name] = {} end 
+    local actiontable = tasks[name][timer] or nil 
+	if not tasks[name][timer] then 
+		tasks[name][timer] = {}	
+		actiontable = tasks[name][timer]
 		table.insert(actiontable,func)
+        if debuglog then print('threads:CreateThread') end
 		CreateThread(function()
 			while true do
 				Wait(timer)
