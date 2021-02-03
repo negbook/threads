@@ -15,7 +15,7 @@ Threads.loop = function(func,_timer, _name)
 		tasks[name][timer] = {}	
 		actiontable = tasks[name][timer]
 		table.insert(actiontable,func)
-        if debuglog then print('threads:CreateThread') end
+        if debuglog then print('threads:CreateThread:'.._timer, _name) end
 		CreateThread(function()
 			while true do
 				Wait(timer)
