@@ -1,7 +1,7 @@
 
 Threads = {}
 Threads_Tasks = {}
-
+Threads_Once = {}
 debuglog = true 
 
 
@@ -27,7 +27,6 @@ Threads.loop = function(func,_timer, _name)
 		table.insert(actiontable,func)
         
 		Citizen.CreateThread(function() 
-            if debuglog then print('threads:CreateLoop:CreateThread:'.._timer, _name) end
 			while true do
 				for i=1,#actiontable do 
                     actiontable[i]()
@@ -35,6 +34,38 @@ Threads.loop = function(func,_timer, _name)
 				end 
                 
                 if timer >= 0 then Wait(timer) end -- timer -1 -2 -3... is for Custom Wait but want to group all -1 -2 -3 ... loops together
+			end 
+		end)
+	end 
+end
+
+Threads.loop_simple = function(func,_timer, _name)
+	if debuglog and not _timer then 
+		print("[BAD Hobbits]Some Threads.loop timer is nil on "..GetCurrentResourceName())
+	end 
+	
+    local name = _name or 'default'
+    if not Threads_Tasks[name] then Threads_Tasks[name] = {} end -- 新建一個名稱表 'default'
+    
+    local timer = _timer or 0
+    local actiontable = Threads_Tasks[name][timer] or nil 
+ 
+	if actiontable then  
+        table.insert(actiontable,func)  -- 如果default此毫秒已存在 則添加到循環流程中
+    else                                -- 否則新建一個default的毫秒表 以及新建一個循環線程
+        
+		Threads_Tasks[name][timer] = {}	
+		actiontable = Threads_Tasks[name][timer]
+		table.insert(actiontable,func)
+        
+		Citizen.CreateThread(function() 
+			while true do
+				for i=1,#actiontable do 
+                    actiontable[i]()
+
+				end 
+                
+                
 			end 
 		end)
 	end 
@@ -57,16 +88,57 @@ Threads.CreateLoop = function(...)
         timer = 0
         func = tbl[1]
     end 
+    if debuglog then print('threads:CreateLoop:CreateThread:'..timer, name) end
     Threads.loop(func,timer,name)
 end
 
-Threads.CreateLoopSimple = function(func) --for lazy guy
-    Citizen.CreateThread(function() 
-        if debuglog then print('threads:CreateLoopSimple:CreateThread') end
-		while true do
-			func()
-		end 
-	end)
+Threads.CreateLoopOnce = function(...) 
+    local tbl = {...}
+    local length = #tbl
+    local func,timer,name
+    if length == 3 then 
+        name = tbl[1]
+        timer = tbl[2]
+        func = tbl[3]
+    elseif  length == 2 then 
+        name = GetCurrentResourceName()
+        timer = tbl[1]
+        func = tbl[2]
+    elseif  length == 1 then 
+        name = GetCurrentResourceName()
+        timer = 0
+        func = tbl[1]
+    end 
+    if not Threads_Once[name] then 
+        Threads_Once[name] = true
+        if debuglog then print('threads:CreateLoopOnce:CreateThread:'..timer, name) end
+        Threads.loop(func,timer,name)
+    end 
+end
+
+
+
+Threads.CreateLoopSimple = function(...) --for lazy guy
+   
+        local tbl = {...}
+        local length = #tbl
+        local func,timer,name
+        if length == 3 then 
+            name = tbl[1]
+            timer = tbl[2]
+            func = tbl[3]
+        elseif  length == 2 then 
+            name = GetCurrentResourceName()
+            timer = tbl[1]
+            func = tbl[2]
+        elseif  length == 1 then 
+            name = GetCurrentResourceName()
+            timer = 0
+            func = tbl[1]
+        end 
+        if debuglog then print('threads:CreateLoopSimple:CreateThread:'..timer, name) end
+        Threads.loop_simple(func,timer,name)
+
 end
 
 
