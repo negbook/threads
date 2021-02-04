@@ -11,13 +11,15 @@ client_script '@threads/threads.lua'
 ```
 
 [FUNCTIONS]
-
+```
 Threads.CreateLoop(namestring,millisecond,function)
 Threads.CreateLoopSimple(function)  -- just CreateThread(function while true do  ... end) but !!! without Wait(...)  make sure you know what you are doing with this function 
+```
 
 old:
+```
 Threads.loop(function,millisecond,namestring)
-
+```
 
 
 [USAGE]
