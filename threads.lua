@@ -1,41 +1,70 @@
 
 Threads = {}
-tasks = {}
+Threads_Tasks = {}
+
 debuglog = true 
+
+
+
 
 Threads.loop = function(func,_timer, _name)
 	if debuglog and not _timer then 
 		print("[BAD Hobbits]Some Threads.loop timer is nil on "..GetCurrentResourceName())
 	end 
-	local timer = _timer or 0
+	
     local name = _name or 'default'
-    if not tasks[name] then tasks[name] = {} end 
-    local actiontable = tasks[name][timer] or nil 
-	if not tasks[name][timer] then 
-		tasks[name][timer] = {}	
-		actiontable = tasks[name][timer]
+    if not Threads_Tasks[name] then Threads_Tasks[name] = {} end -- 新建一個名稱表 'default'
+    
+    local timer = _timer or 0
+    local actiontable = Threads_Tasks[name][timer] or nil 
+ 
+	if actiontable then  
+        table.insert(actiontable,func)  -- 如果default此毫秒已存在 則添加到循環流程中
+    else                                -- 否則新建一個default的毫秒表 以及新建一個循環線程
+        
+		Threads_Tasks[name][timer] = {}	
+		actiontable = Threads_Tasks[name][timer]
 		table.insert(actiontable,func)
-        if debuglog then print('threads:CreateThread:'.._timer, _name) end
-		CreateThread(function()
+        
+		Citizen.CreateThread(function() 
+            if debuglog then print('threads:CreateThread:'.._timer, _name) end
 			while true do
-				Wait(timer)
 				for i=1,#actiontable do 
-					actiontable[i]()
+                    actiontable[i]()
+
 				end 
+                
+                if timer >= 0 then Wait(timer) end 
 			end 
 		end)
-	else 
-		table.insert(actiontable,func)
 	end 
 end
 
-
+Threads.CreateLoop = function(...) 
+    local tbl = {...}
+    local length = #tbl
+    local func,timer,name
+    if length == 3 then 
+        name = tbl[1]
+        timer = tbl[2]
+        func = tbl[3]
+    elseif  length == 2 then 
+        name = GetCurrentResourceName()
+        timer = tbl[1]
+        func = tbl[2]
+    elseif  length == 1 then 
+        name = GetCurrentResourceName()
+        timer = 0
+        func = tbl[1]
+    end 
+    Threads.loop(func,timer,name)
+end
 
 --debug 
 if debuglog then 
 local thisname = "threads"
 
-CreateThread(function()
+Citizen.CreateThread(function()
 	if IsDuplicityVersion() then 
 
 		if GetCurrentResourceName() ~= thisname then 
