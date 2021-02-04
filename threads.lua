@@ -34,7 +34,7 @@ Threads.loop = function(func,_timer, _name)
 
 				end 
                 
-                if timer >= 0 then Wait(timer) end 
+                if timer >= 0 then Wait(timer) end -- timer -1 -2 -3... is for Custom Wait but want to group all -1 -2 -3 ... loops together
 			end 
 		end)
 	end 
@@ -60,7 +60,7 @@ Threads.CreateLoop = function(...)
     Threads.loop(func,timer,name)
 end
 
-Threads.CreateLoopSimple = function(func) 
+Threads.CreateLoopSimple = function(func) --for lazy guy
     Citizen.CreateThread(function() 
         if debuglog then print('threads:CreateLoopSimple:CreateThread') end
 		while true do

@@ -4,9 +4,20 @@ Threads utilities for FXServer
 [INSTALLATION]
 
 Set it as a dependency in you fxmanifest.lua
+Set debuglog = false in threads.lua if you dont want any rubbish message
 
 ```
 client_script '@threads/threads.lua'
+```
+
+[FUNCTIONS]
+```
+Threads.CreateLoop(namestring,millisecond,function)
+Threads.CreateLoopSimple(function)  -- just CreateThread(function while true do  ... end) but !!! without Wait(...)  make sure you know what you are doing with this function 
+
+old:
+Threads.loop(function,millisecond,namestring)
+
 ```
 
 [USAGE]
@@ -26,9 +37,9 @@ othertasks = function()
 end 
 
 Citizen.CreateThread(function()
-    Threads.loop(expandWorldtasks,0)
-    Threads.loop(gametimetasks,500)
-    Threads.loop(othertasks,500)
+    Threads.CreateLoop(expandWorldtasks)
+    Threads.CreateLoop(500,gametimetasks)
+    Threads.CreateLoop(500,othertasks)
 end)
 ```
 
@@ -58,25 +69,25 @@ end)
         end 
         
         Citizen.CreateThread(function()
-            Threads.loop(expandWorldtasks,0)
+            Threads.CreateLoop(0,expandWorldtasks)
         end)
 or
  >> 
     Citizen.CreateThread(function()
         --while true do 
             --Citizen.Wait(0)
-            Threads.loop(function() 
+            Threads.CreateLoop(function() 
                 ExpandWorldLimits( -9000.0, -11000.0, 30.0 )  
                 ExpandWorldLimits(10000.0, 12000.0, 30.0) 
-            end,0)
+            end)
         --end 
     end )
     >> 
         Citizen.CreateThread(function()
-            Threads.loop(function() 
+            Threads.CreateLoop(function() 
                 ExpandWorldLimits( -9000.0, -11000.0, 30.0 )  
                 ExpandWorldLimits(10000.0, 12000.0, 30.0) 
-            end,0)
+            end)
         end )
 ```
 
@@ -101,13 +112,13 @@ end )
         print("GAME TIME:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
     end 
     Citizen.CreateThread(function()
-            Threads.loop(gametimetasks,500)
+            Threads.CreateLoop(500,gametimetasks)
     end )
     othertasks = function() --SOMEWHERE2.lua
         print("GAME TIME2:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
     end 
     Citizen.CreateThread(function()
-            Threads.loop(othertasks,500)
+            Threads.CreateLoop(500,othertasks)
     end )
     
 or 
@@ -118,7 +129,7 @@ or
         print("GAME TIME2:"..string.format("%0.2d",GetClockHours())..":"..string.format("%0.2d",GetClockMinutes()))
     end 
     Citizen.CreateThread(function() --LAST LINE OF SOMEWHERE.lua 
-        Threads.loop(gametimetasks,500)
-        Threads.loop(othertasks,500)
+        Threads.CreateLoop(500,gametimetasks)
+        Threads.CreateLoop(500,othertasks)
     end )
 ```
