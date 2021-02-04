@@ -1,6 +1,7 @@
 
 Threads = {}
 Threads_Tasks = {}
+Threads_Tasks_Custom = {}
 Threads_Once = {}
 debuglog = true 
 
@@ -39,23 +40,23 @@ Threads.loop = function(func,_timer, _name)
 	end 
 end
 
-Threads.loop_simple = function(func,_timer, _name)
+Threads.loop_custom = function(func,_timer, _name)
 	if debuglog and not _timer then 
 		print("[BAD Hobbits]Some Threads.loop timer is nil on "..GetCurrentResourceName())
 	end 
 	
     local name = _name or 'default'
-    if not Threads_Tasks[name] then Threads_Tasks[name] = {} end -- 新建一個名稱表 'default'
+    if not Threads_Tasks_Custom[name] then Threads_Tasks_Custom[name] = {} end -- 新建一個名稱表 'default'
     
     local timer = _timer or 0
-    local actiontable = Threads_Tasks[name][timer] or nil 
+    local actiontable = Threads_Tasks_Custom[name][timer] or nil 
  
 	if actiontable then  
         table.insert(actiontable,func)  -- 如果default此毫秒已存在 則添加到循環流程中
     else                                -- 否則新建一個default的毫秒表 以及新建一個循環線程
         
-		Threads_Tasks[name][timer] = {}	
-		actiontable = Threads_Tasks[name][timer]
+		Threads_Tasks_Custom[name][timer] = {}	
+		actiontable = Threads_Tasks_Custom[name][timer]
 		table.insert(actiontable,func)
         
 		Citizen.CreateThread(function() 
@@ -118,7 +119,7 @@ end
 
 
 
-Threads.CreateLoopSimple = function(...) --for lazy guy
+Threads.CreateLoopCustom = function(...) 
    
         local tbl = {...}
         local length = #tbl
@@ -136,8 +137,8 @@ Threads.CreateLoopSimple = function(...) --for lazy guy
             timer = 0
             func = tbl[1]
         end 
-        if debuglog then print('threads:CreateLoopSimple:CreateThread:'..timer, name) end
-        Threads.loop_simple(func,timer,name)
+        if debuglog then print('threads:CreateLoopCustom:CreateThread:'..timer, name) end
+        Threads.loop_custom(func,timer,name)
 
 end
 

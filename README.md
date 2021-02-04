@@ -13,7 +13,8 @@ client_script '@threads/threads.lua'
 [FUNCTIONS]
 ```
 Threads.CreateLoop(namestring,millisecond,function)
-Threads.CreateLoopSimple(function)  -- just CreateThread(function while true do  ... end) but !!! without Wait(...)  make sure you know what you are doing with this function 
+Threads.CreateLoopOnce(namestring,millisecond,function) --  ignore second call of this
+Threads.CreateLoopCustom(function)  -- just like CreateLoop but without Wait 
 ```
 
 old:
