@@ -27,7 +27,7 @@ Threads.loop = function(func,_timer, _name)
 		table.insert(actiontable,func)
         
 		Citizen.CreateThread(function() 
-            if debuglog then print('threads:CreateThread:'.._timer, _name) end
+            if debuglog then print('threads:CreateLoop:CreateThread:'.._timer, _name) end
 			while true do
 				for i=1,#actiontable do 
                     actiontable[i]()
@@ -59,6 +59,16 @@ Threads.CreateLoop = function(...)
     end 
     Threads.loop(func,timer,name)
 end
+
+Threads.CreateLoopSimple = function(func) 
+    Citizen.CreateThread(function() 
+        if debuglog then print('threads:CreateLoopSimple:CreateThread') end
+		while true do
+			func()
+		end 
+	end)
+end
+
 
 --debug 
 if debuglog then 
