@@ -12,8 +12,8 @@ client_script '@threads/threads.lua'
 
 [FUNCTIONS]
 ```
-Threads.CreateLoop(namestring,millisecond,function)
-Threads.CreateLoopOnce(namestring,millisecond,function) --  ignore second call of this
+Threads.CreateLoop(namestring,millisecond,function) -- group all the same millisecond loop (with a name)  into a while true do 
+Threads.CreateLoopOnce(namestring,millisecond,function) --  ignore second call of this it will group into CreateLoop if a loop is already exist
 Threads.CreateLoopCustom(function)  -- just like CreateLoop but without Wait 
 ```
 
