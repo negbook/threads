@@ -29,13 +29,23 @@ Threads.loop = function(func,_timer, _name)
         
 		Citizen.CreateThread(function() 
 			while true do
+                local loadWait = false
+                local _Wait = Wait
+                local Wait = function(ms)
+                    loadWait = true 
+                    return _Wait(ms)
+                end 
 				for i=1,#actiontable do 
                     actiontable[i]()
 
 				end 
                 
                 if timer >= 0 then Wait(timer) end -- timer -1 -2 -3... is for Custom Wait but want to group all -1 -2 -3 ... loops together
-			end 
+                if not loadWait then 
+                
+                    Wait(0)
+                end 
+            end 
 		end)
 	end 
 end
