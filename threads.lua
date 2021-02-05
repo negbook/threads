@@ -35,16 +35,17 @@ Threads.loop = function(func,_timer, _name)
                     loadWait = true 
                     return _Wait(ms)
                 end 
-				for i=1,#actiontable do 
-                    actiontable[i]()
-
-				end 
-                
                 if timer >= 0 then Wait(timer) end -- timer -1 -2 -3... is for Custom Wait but want to group all -1 -2 -3 ... loops together
                 if not loadWait then 
                 
                     Wait(0)
                 end 
+				for i=1,#actiontable do 
+                    actiontable[i]()
+
+				end 
+                
+                
             end 
 		end)
 	end 
@@ -77,16 +78,17 @@ Threads.loop_custom = function(func,_timer, _name)
                     loadWait = true 
                     return _Wait(ms)
                 end 
+                if not loadWait then 
+                
+                    Wait(0)
+                end 
                 if actiontable or #actiontable >0 then 
                     for i=1,#actiontable do 
                         actiontable[i]()
                         
                     end 
                 end 
-                if not loadWait then 
                 
-                    Wait(0)
-                end 
 			end 
 		end)
 	end 
