@@ -154,7 +154,7 @@ Threads.CreateLoopOnce = function(...)
 end
 
 Threads.KillLoop = function(...) 
-    print(...)
+
     local tbl = {...}
     local length = #tbl
     local timer,name
