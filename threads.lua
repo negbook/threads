@@ -61,14 +61,21 @@ Threads.loop_custom = function(func,_timer, _name)
         
 		Citizen.CreateThread(function() 
 			while true do
+                local loadWait = false
+                local _Wait = Wait
+                local Wait = function(ms)
+                    loadWait = true 
+                    return _Wait(ms)
+                end 
                 if actiontable or #actiontable >0 then 
-				for i=1,#actiontable do 
-                    actiontable[i]()
-                    
-				end 
-                else 
+                    for i=1,#actiontable do 
+                        actiontable[i]()
+                        
+                    end 
+                end 
+                if not loadWait then 
                 
-                Wait(0)
+                    Wait(0)
                 end 
 			end 
 		end)
