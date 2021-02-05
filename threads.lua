@@ -3,6 +3,7 @@ Threads = {}
 Threads_Tasks = {}
 Threads_Tasks_Custom = {}
 Threads_Once = {}
+Threads_Kill = {}
 debuglog = true 
 
 
@@ -29,6 +30,16 @@ Threads.loop = function(func,_timer, _name)
         
 		Citizen.CreateThread(function() 
 			while true do
+                if Threads_Kill[name] and Threads_Kill[name][timer] then 
+                    Threads_Kill[name][timer] = nil 
+                    if Threads_Once[name] and Threads_Once[name][timer] then 
+                        Threads_Once[name][timer] = nil
+                    end 
+                    if Threads_Tasks[name] and Threads_Tasks[name][timer] then 
+                        Threads_Tasks[name][timer] = nil
+                    end 
+                    break 
+                end 
                 local loadWait = false
                 local _Wait = Wait
                 local Wait = function(ms)
@@ -72,6 +83,7 @@ Threads.loop_custom = function(func,_timer, _name)
         
 		Citizen.CreateThread(function() 
 			while true do
+                
                 local loadWait = false
                 local _Wait = Wait
                 local Wait = function(ms)
@@ -132,14 +144,33 @@ Threads.CreateLoopOnce = function(...)
         timer = 0
         func = tbl[1]
     end 
-    if not Threads_Once[name] then 
-        Threads_Once[name] = true
+
+    if not Threads_Once[name] then Threads_Once[name] = {} end 
+    if not Threads_Once[name][timer] then 
+        Threads_Once[name][timer] = true
         if debuglog then print('threads:CreateLoopOnce:CreateThread:'..timer, name) end
         Threads.loop(func,timer,name)
     end 
 end
 
-
+Threads.KillLoop = function(...) 
+    print(...)
+    local tbl = {...}
+    local length = #tbl
+    local timer,name
+    if  length == 2 then 
+        name = tbl[1]
+        timer = tbl[2]
+    elseif  length == 1 then 
+        name = tbl[1]
+        timer = 0
+    end 
+    if not Threads_Kill[name] then Threads_Kill[name] = {} end 
+    if not Threads_Kill[name][timer] then 
+        Threads_Kill[name][timer] = true
+         if debuglog then print('threads:KillLoop:'..timer, name) end
+    end 
+end
 
 Threads.CreateLoopCustom = function(...) 
    
