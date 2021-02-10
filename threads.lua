@@ -3,6 +3,7 @@ Threads = {}
 Threads_Tasks = {}
 Threads_Tasks_Custom = {}
 Threads_Once = {}
+Threads_Once_Custom = {}
 Threads_Kill = {}
 debuglog = true 
 
@@ -19,14 +20,17 @@ Threads.loop = function(func,_timer, _name)
     
     local timer = _timer or 0
     local actiontable = Threads_Tasks[name][timer] or nil 
- 
+    local nametable = {}
 	if actiontable then  
         table.insert(actiontable,func)  -- 如果default此毫秒已存在 則添加到循環流程中
+        table.insert(nametable,name)
     else                                -- 否則新建一個default的毫秒表 以及新建一個循環線程
         
 		Threads_Tasks[name][timer] = {}	
 		actiontable = Threads_Tasks[name][timer]
+        nametable = {}
 		table.insert(actiontable,func)
+        table.insert(nametable,name)
         
 		Citizen.CreateThread(function() 
 			while true do
@@ -34,6 +38,7 @@ Threads.loop = function(func,_timer, _name)
                     Threads_Kill[name][timer] = nil 
                     if Threads_Once[name] and Threads_Once[name][timer] then 
                         Threads_Once[name][timer] = nil
+                       
                     end 
                     if Threads_Tasks[name] and Threads_Tasks[name][timer] then 
                         Threads_Tasks[name][timer] = nil
@@ -52,7 +57,7 @@ Threads.loop = function(func,_timer, _name)
                     Wait(0)
                 end 
 				for i=1,#actiontable do 
-                    actiontable[i]()
+                    actiontable[i](nametable[i])
 
 				end 
                 
@@ -72,18 +77,32 @@ Threads.loop_custom = function(func,_timer, _name)
     
     local timer = _timer or 0
     local actiontable = Threads_Tasks_Custom[name][timer] or nil 
+    local nametable = {}
  
 	if actiontable then  
         table.insert(actiontable,func)  -- 如果default此毫秒已存在 則添加到循環流程中
+        table.insert(nametable,name)
     else                                -- 否則新建一個default的毫秒表 以及新建一個循環線程
         
 		Threads_Tasks_Custom[name][timer] = {}	
 		actiontable = Threads_Tasks_Custom[name][timer]
+        nametable = {}
 		table.insert(actiontable,func)
+        table.insert(nametable,name)
         
 		Citizen.CreateThread(function() 
 			while true do
-                
+                if Threads_Kill[name] and Threads_Kill[name][timer] then 
+                    Threads_Kill[name][timer] = nil 
+                    if Threads_Once_Custom[name] and Threads_Once_Custom[name][timer] then 
+                        Threads_Once_Custom[name][timer] = nil
+                       
+                    end 
+                    if Threads_Tasks[name] and Threads_Tasks[name][timer] then 
+                        Threads_Tasks[name][timer] = nil
+                    end 
+                    break 
+                end 
                 local loadWait = false
                 local _Wait = Wait
                 local Wait = function(ms)
@@ -96,7 +115,7 @@ Threads.loop_custom = function(func,_timer, _name)
                 end 
                 if actiontable or #actiontable >0 then 
                     for i=1,#actiontable do 
-                        actiontable[i]()
+                        actiontable[i](nametable[i])
                         
                     end 
                 end 
@@ -191,7 +210,34 @@ Threads.CreateLoopCustom = function(...)
             func = tbl[1]
         end 
         if debuglog then print('threads:CreateLoopCustom:CreateThread:'..timer, name) end
-        Threads.loop_custom(func,timer,name)
+        Threads.loop_custom (func,timer,name)
+
+end
+
+Threads.CreateLoopCustomOnce = function(...) 
+   
+        local tbl = {...}
+        local length = #tbl
+        local func,timer,name
+        if length == 3 then 
+            name = tbl[1]
+            timer = tbl[2]
+            func = tbl[3]
+        elseif  length == 2 then 
+            name = GetCurrentResourceName()
+            timer = tbl[1]
+            func = tbl[2]
+        elseif  length == 1 then 
+            name = GetCurrentResourceName()
+            timer = 0
+            func = tbl[1]
+        end 
+        if not Threads_Once_Custom[name] then Threads_Once_Custom[name] = {} end 
+        if not Threads_Once_Custom[name][timer] then 
+            Threads_Once_Custom[name][timer] = true
+            if debuglog then print('threads:CreateLoopCustomOnce:CreateThread:'..timer, name) end
+            Threads.loop_custom (func,timer,name)
+        end 
 
 end
 
