@@ -253,15 +253,18 @@ Threads.CreateLoad = function(thing,RequestFunction,HasLoadedFunction,cb)
             return
         end 
         local LoadingThing = 'Something'
-        AddTextEntry("NOWLOADINGTEXT"..LoadingThing, "Loading...")
+        if debuglog then 
+            print("Threads.CreateLoad "..thing,RequestFunction,HasLoadedFunction)
+        end 
         local RequestTable = {"RequestModel","RequestStreamedTextureDict","RequestNamedPtfxAsset","RequestAnimSet","RequestAnimDict","RequestWeaponAsset","RequestScaleformMovie"}
         for i=1,#RequestTable do  
             if RequestFunction == _G[RequestTable[i]] then 
                 LoadingThing = RequestTable[i]
-                AddTextEntry("NOWLOADINGTEXT"..LoadingThing, "Loading...")
+                
             end 
         end 
         if busyspin then 
+        AddTextEntry("NOWLOADINGTEXT"..LoadingThing, "Loading...")
         BeginTextCommandBusyspinnerOn("NOWLOADINGTEXT"..LoadingThing)
         EndTextCommandBusyspinnerOn(4)
         end 
