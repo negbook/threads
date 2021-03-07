@@ -6,7 +6,7 @@ Threads_Once = {}
 Threads_Once_Custom = {}
 Threads_Kill = {}
 debuglog = true 
-
+busyspin = true
 
 
 
@@ -240,6 +240,48 @@ Threads.CreateLoopCustomOnce = function(...)
         end 
 
 end
+
+Threads.CreateLoad = function(thing,RequestFunction,HasLoadedFunction,cb)
+    CreateThread(function()
+        local LoadingThing = ''
+        local RequestTable = {"RequestModel","RequestStreamedTextureDict","RequestNamedPtfxAsset","RequestAnimSet","RequestAnimDict","RequestWeaponAsset","RequestScaleformMovie"}
+        for i=1,#RequestTable do  
+            if RequestFunction == _G[RequestTable[i]] then 
+                LoadingThing = RequestTable[i]
+                AddTextEntry("NOWLOADINGTEXT"..LoadingThing, "Loading...")
+            end 
+        end 
+        if busyspin then 
+        BeginTextCommandBusyspinnerOn("NOWLOADINGTEXT"..LoadingThing)
+        EndTextCommandBusyspinnerOn(4)
+        end 
+        local SinceTime = GetGameTimer()
+        local handle = RequestFunction(thing)
+        local failed = false;
+        while not HasLoadedFunction(handle) do 
+            Wait(33)
+            if GetGameTimer() > SinceTime + 5000 then 
+                if debuglog then
+                AddTextEntry("NOWLOADINGTEXT"..LoadingThing,"~r~".."Report Loading Failed on\n"..LoadingThing..":~s~\n".. tostring(thing) .."")
+                SetNotificationTextEntry("NOWLOADINGTEXT"..LoadingThing)
+                DrawNotification(false, false)
+                print("Loading Failed on "..LoadingThing..":  ".. tostring(thing) .."")
+                end 
+                failed = true
+                break
+            end 
+        end 
+        if busyspin then 
+        BusyspinnerOff()
+        end 
+        if not failed then 
+            cb(handle)
+        else 
+            cb(nil)
+        end 
+    end)
+
+end 
 
 
 --debug 
