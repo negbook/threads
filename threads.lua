@@ -146,6 +146,7 @@ Threads.CreateLoop = function(...)
     Threads.loop(func,timer,name)
 end
 
+
 Threads.CreateLoopOnce = function(...) 
     local tbl = {...}
     local length = #tbl
@@ -241,62 +242,50 @@ Threads.CreateLoopCustomOnce = function(...)
 
 end
 
-Threads.CreateLoad = function(thing,RequestFunction,HasLoadedFunction,cb)  
+Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
+    if debuglog then print('threads:CreateLoad:'..thing) end
+    local handle = loadfunc(thing)
+    local SinceTime = GetGameTimer()
     
-    CreateThread(function()
-        if HasLoadedFunction(thing) then 
-            cb(thing)
-            return
-        end 
-        if HasLoadedFunction(RequestFunction(thing)) then 
-            cb(RequestFunction(thing))
-            return
-        end 
-        local LoadingThing = 'Something'
-        if debuglog then 
-            print("Threads.CreateLoad "..thing,RequestFunction,HasLoadedFunction)
-        end 
-        local RequestTable = {"RequestModel","RequestStreamedTextureDict","RequestNamedPtfxAsset","RequestAnimSet","RequestAnimDict","RequestWeaponAsset","RequestScaleformMovie"}
-        for i=1,#RequestTable do  
-            if RequestFunction == _G[RequestTable[i]] then 
-                LoadingThing = RequestTable[i]
-                
+    local failed = false
+    local nowcb = nil     
+    while true do 
+        if not(checkfunc(thing)) and GetGameTimer() > SinceTime + 1000 then 
+            if busyspin then 
+            AddTextEntry("TEXT_LOAD", "Loading...")
+            BeginTextCommandBusyspinnerOn("TEXT_LOAD")
+            EndTextCommandBusyspinnerOn(4)
             end 
         end 
-        if busyspin then 
-        AddTextEntry("NOWLOADINGTEXT"..LoadingThing, "Loading...")
-        BeginTextCommandBusyspinnerOn("NOWLOADINGTEXT"..LoadingThing)
-        EndTextCommandBusyspinnerOn(4)
+        if not(checkfunc(thing)) and GetGameTimer() > SinceTime + 5000 then 
+            failed = true 
         end 
-        local SinceTime = GetGameTimer()
-        local handle = RequestFunction(thing)
-        local failed = false;
-        while not HasLoadedFunction(handle) do 
-            Wait(33)
-            if GetGameTimer() > SinceTime + 5000 then 
-                if debuglog then
-                AddTextEntry("NOWLOADINGTEXT"..LoadingThing,"~r~".."Report Loading Failed on\n"..LoadingThing..":~s~\n".. tostring(thing) .."")
-                SetNotificationTextEntry("NOWLOADINGTEXT"..LoadingThing)
-                DrawNotification(false, false)
-                print("Loading Failed on "..LoadingThing..":  ".. tostring(thing) .."")
-                end 
-                failed = true
-                break
+        if HasScaleformMovieLoaded ~= checkfunc then 
+            if checkfunc(thing) then 
+                nowcb = thing 
             end 
-        end 
-        if busyspin then 
-        BusyspinnerOff()
-        end 
-        if not failed then 
-            cb(handle)
-            return
         else 
-            cb(nil)
-            return
+            local handle = loadfunc(thing)
+            if checkfunc(handle) then 
+                nowcb = handle 
+            end 
         end 
-    end)
-
-end 
+        if failed then 
+            break 
+        elseif nowcb then  
+            break
+        end 
+        Wait(33)
+    end 
+    if busyspin then 
+        BusyspinnerOff()
+    end 
+    if failed then
+        if debuglog then print('threads:CreateLoad:'..thing.."Loading Failed") end
+    elseif nowcb then  
+        cb(nowcb)
+    end 
+end
 
 
 --debug 
