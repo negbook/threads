@@ -241,9 +241,19 @@ Threads.CreateLoopCustomOnce = function(...)
 
 end
 
-Threads.CreateLoad = function(thing,RequestFunction,HasLoadedFunction,cb)
+Threads.CreateLoad = function(thing,RequestFunction,HasLoadedFunction,cb)  
+    
     CreateThread(function()
-        local LoadingThing = ''
+        if HasLoadedFunction(thing) then 
+            cb(thing)
+            return
+        end 
+        if HasLoadedFunction(RequestFunction(thing)) then 
+            cb(RequestFunction(thing))
+            return
+        end 
+        local LoadingThing = 'Something'
+        AddTextEntry("NOWLOADINGTEXT"..LoadingThing, "Loading...")
         local RequestTable = {"RequestModel","RequestStreamedTextureDict","RequestNamedPtfxAsset","RequestAnimSet","RequestAnimDict","RequestWeaponAsset","RequestScaleformMovie"}
         for i=1,#RequestTable do  
             if RequestFunction == _G[RequestTable[i]] then 
@@ -276,8 +286,10 @@ Threads.CreateLoad = function(thing,RequestFunction,HasLoadedFunction,cb)
         end 
         if not failed then 
             cb(handle)
+            return
         else 
             cb(nil)
+            return
         end 
     end)
 
