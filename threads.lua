@@ -1,4 +1,3 @@
-
 Threads = {}
 Threads_Tasks = {}
 Threads_Tasks_Custom = {}
@@ -8,7 +7,14 @@ Threads_Kill = {}
 debuglog = false 
 busyspin = true
 
+Threads_Total = 0
 
+local _CreateThread = CreateThread
+local CreateThread = function(...)
+    Threads_Total = Threads_Total + 1
+    print(Threads_Total)
+    return _CreateThread(...)
+end 
 
 Threads.loop = function(func,_timer, _name)
 	if debuglog and not _timer then 
@@ -20,6 +26,7 @@ Threads.loop = function(func,_timer, _name)
     
     local timer = _timer or 0
     local actiontable = Threads_Tasks[name][timer] or nil 
+        
     local nametable = {}
 	if actiontable then  
         table.insert(actiontable,func)  -- 如果default此毫秒已存在 則添加到循環流程中
@@ -32,7 +39,7 @@ Threads.loop = function(func,_timer, _name)
 		table.insert(actiontable,func)
         table.insert(nametable,name)
         
-		Citizen.CreateThread(function() 
+		CreateThread(function() 
 			while true do
                 if Threads_Kill[name] and Threads_Kill[name][timer] then 
                     Threads_Kill[name][timer] = nil 
@@ -43,7 +50,7 @@ Threads.loop = function(func,_timer, _name)
                     if Threads_Tasks[name] and Threads_Tasks[name][timer] then 
                         Threads_Tasks[name][timer] = nil
                     end 
-                    break 
+                    break  
                 end 
                 local loadWait = false
                 local _Wait = Wait
@@ -63,6 +70,7 @@ Threads.loop = function(func,_timer, _name)
                 
                 
             end 
+            return 
 		end)
 	end 
 end
@@ -90,7 +98,7 @@ Threads.loop_custom = function(func,_timer, _name)
 		table.insert(actiontable,func)
         table.insert(nametable,name)
         
-		Citizen.CreateThread(function() 
+		CreateThread(function() 
 			while true do
                 if Threads_Kill[name] and Threads_Kill[name][timer] then 
                     Threads_Kill[name][timer] = nil 
@@ -121,6 +129,7 @@ Threads.loop_custom = function(func,_timer, _name)
                 end 
                 
 			end 
+            return 
 		end)
 	end 
 end
@@ -186,9 +195,28 @@ Threads.KillLoop = function(...)
         timer = 0
     end 
     if not Threads_Kill[name] then Threads_Kill[name] = {} end 
+    for i,v in pairs(Threads_Tasks[name]) do 
+        if not Threads_Kill[name][i] then Threads_Kill[name][i] = true end 
+        if debuglog then print('threads:KillLoop:'..timer, name) end
+    end 
+end
+
+Threads.KillLoopByTimer = function(...) 
+
+    local tbl = {...}
+    local length = #tbl
+    local timer,name
+    if  length == 2 then 
+        name = tbl[1]
+        timer = tbl[2]
+    elseif  length == 1 then 
+        name = tbl[1]
+        timer = 0
+    end 
+    if not Threads_Kill[name] then Threads_Kill[name] = {} end 
     if not Threads_Kill[name][timer] then 
         Threads_Kill[name][timer] = true
-         if debuglog then print('threads:KillLoop:'..timer, name) end
+         if debuglog then print('threads:KillLoopByTimer:'..timer, name) end
     end 
 end
 
@@ -292,7 +320,7 @@ end
 if debuglog then 
 local thisname = "threads"
 
-Citizen.CreateThread(function()
+CreateThread(function()
 	if IsDuplicityVersion() then 
 
 		if GetCurrentResourceName() ~= thisname then 
