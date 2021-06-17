@@ -4,7 +4,7 @@ Threads_Tasks_Custom = {}
 Threads_Once = {}
 Threads_Once_Custom = {}
 Threads_Kill = {}
-debuglog = false 
+debuglog = false
 busyspin = true
 
 Threads_Total = 0
@@ -12,7 +12,9 @@ Threads_Total = 0
 local _CreateThread = CreateThread
 local CreateThread = function(...)
     Threads_Total = Threads_Total + 1
-    print(Threads_Total)
+    if debuglog then 
+    print('CreateThread Total By Threads:'..Threads_Total.." on "..GetCurrentResourceName())
+    end 
     return _CreateThread(...)
 end 
 
