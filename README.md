@@ -15,9 +15,11 @@ client_script '@threads/threads.lua'
 Threads.CreateLoop(actionname,millisecondID,function(name,totalofloops)) or (actionname,function(name,totalofloops)) or (function(name,totalofloops)) -- group all the same millisecond loop (with a name)  into a while true do 
 Threads.CreateLoopOnce(actionname,millisecondID,function(name,totalofloops)) or (actionname,function(name,totalofloops)) or (function(name,totalofloops)) --  ignore second call of this. it will group into CreateLoop if a loop is already exist
 Threads.KillActionOfLoop(actionname)
+Threads.KillLoop(actionname,millisecondID) -- this is a dangerous function.kill a timer also all actions.
 Threads.CreateLoopCustom(actionname,defaultmillisecondID,function(varname,name,totalofcustomloops),(varname or keeping empty))  -- just like CreateLoop but with delay.setter and delay.getter
 Threads.CreateLoopCustomOnce(actionname,defaultmillisecondID,function(varname,name,totalofcustomloops),(varname or keeping empty if you just want to using s/getter))  -- just like CreateLoop but with delay.setter and delay.getter.Will default using functionhash if the varname is empty.
 Threads.KillActionOfLoopCustom(actionname) 
+Threads.KillLoopCustom(actionname,millisecondID) -- this is a dangerous function.kill a timer also all actions.
 Threads.GetLoopCustom(varname)
 Threads.SetLoopCustom(varname,millisecond)
 ```
