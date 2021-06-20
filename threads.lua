@@ -365,16 +365,4 @@ CreateThread(function()
 end)
 end 
 
---[=[
-CreateThread(function() 
-    
-    
-    Threads.CreateLoopCustom('asd',1000,function(delay,name,total)
-        local sss = #(GetEntityCoords(PlayerPedId())-vector3(0.0,0.0,70.0))
-        delay.setter(sss)
-        print(delay.getter(),name,total)
-    end)
-    Wait(100)
-    
-end )
---]=]
+
