@@ -207,7 +207,7 @@ Threads.loop2_custom = function(_name,_timer,_func,_varname)
 	end 
 end
 
-
+--pass Varname into parameters[4] with using Threads.SetLoopCustom(Varname,millisecond)/Threads.GetLoopCustom(Varname) to set/get the Delay or just using functionhash with setter/getter instead.
 Threads.CreateLoopCustom = function(...) --actionname,defaulttimer(and ID of timer.will stack actions into the sameID),func,varname(link a custom name to this timer)
     local tbl = {...}
     local length = #tbl
@@ -344,32 +344,7 @@ Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
         cb(nowcb)
     end 
 end
---[=[
-CreateThread(function()
-    Threads.CreateLoopOnce("test",1500,function()
-        print(123)
-    end)
-     Threads.CreateLoopOnce("test",1500,function()
-        print(999)
-    end)
-    Threads.CreateLoopOnce("test",999,function()
-        print(999)
-    end)
-    Threads.CreateLoop("test2",1500,function()
-        print(234)
-        Threads.CreateLoop("test2",5000,function()
-            print(155)
-            Threads.KillLoop('test')
-        end)
-    end)
-     Threads.CreateLoopOnce("test3",999,function()
-        print(123123123)
-    end)
-    Threads.CreateLoop("test3",555,function()
-        print(5555555)
-    end)
-end)
---]=]
+
 --debug 
 if debuglog then 
 local thisname = "threads"
