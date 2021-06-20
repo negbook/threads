@@ -12,17 +12,16 @@ client_script '@threads/threads.lua'
 
 [FUNCTIONS]
 ```
-Threads.CreateLoop(namestring,millisecond,function) or (namestring,function) or (function) -- group all the same millisecond loop (with a name)  into a while true do 
-Threads.CreateLoopOnce(namestring,millisecond,function) or (namestring,function) or (function) --  ignore second call of this. it will group into CreateLoop if a loop is already exist
-Threads.CreateLoopCustom(function)  -- just like CreateLoop but without Wait . for custom delay loop
-Threads.CreateLoopCustomOnce(function)  -- just like CreateLoop but without Wait . for custom delay loop
-Threads.KillLoop(namestring,millisecond) or (namestring)
+Threads.CreateLoop(actionname,millisecondID,function) or (namestring,cbfunc) or (function) -- group all the same millisecond loop (with a name)  into a while true do 
+Threads.CreateLoopOnce(actionname,millisecondID,function) or (namestring,function) or (function) --  ignore second call of this. it will group into CreateLoop if a loop is already exist
+Threads.KillActionOfLoop(actionname)
+Threads.CreateLoopCustom(actionname,defaultmillisecondID,function(varname,name,totalofloops),(varname or keeping empty))  -- just like CreateLoop but with delay.setter and delay.getter
+Threads.CreateLoopCustomOnce(actionname,defaultmillisecondID,function(varname,name,totalofloops),(varname or keeping empty if you just want to using s/getter))  -- just like CreateLoop but with delay.setter and delay.getter.Will default using functionhash if the varname is empty.
+Threads.KillActionOfLoopCustom(actionname) 
+Threads.GetLoopCustom(varname)
+Threads.SetLoopCustom(varname,millisecond)
 ```
 
-old:
-```
-Threads.loop(function,millisecond,namestring)
-```
 
 
 [USAGE]

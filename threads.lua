@@ -124,7 +124,7 @@ Threads.CreateLoopOnce = function(...)
         Threads_Once[name] = true 
     end 
 end
-Threads.KillLoop = function(name)
+Threads.KillActionOfLoop = function(name)
     Threads_Alive[name] = false 
 end 
 
@@ -295,7 +295,7 @@ Threads.SetLoopCustom = function(varname,totimer)
     Threads_Custom_VarTimer[varname] = totimer 
 end 
 
-Threads.KillLoopCustom = function(name)
+Threads.KillActionOfLoopCustom = function(name)
     Threads_Custom_Alive[name] = false 
 end 
 
