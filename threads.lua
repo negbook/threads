@@ -310,7 +310,7 @@ Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
     while true do 
         if not(checkfunc(thing)) and GetGameTimer() > SinceTime + 1000 then 
             if busyspin then 
-            AddTextEntry("TEXT_LOAD", "Loading...")
+            AddTextEntry("TEXT_LOAD", "Loading...(by threads)")
             BeginTextCommandBusyspinnerOn("TEXT_LOAD")
             EndTextCommandBusyspinnerOn(4)
             end 
