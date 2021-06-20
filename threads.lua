@@ -14,7 +14,6 @@ local function Threads_IsActionTableCreated(timer) return Threads_ActionTables[t
 
 Threads_Alive = {}
 Threads_Timers = {}
-Threads_VarTimer = {}
 Threads_Functions = {}
 Threads_Once = {}
 Threads_ActionTables = {}
@@ -63,15 +62,23 @@ Threads.loop2 = function(_name,_timer,_func)
                 --if not loadWait then 
                     --Wait(0)
                 --end 
-                if debuglog then print("Timer:"..timer,"Exist action threads total:"..#actiontable) end
+                --if debuglog then print("Timer:"..timer,"Exist action threads total:"..#actiontable) end
                 if #actiontable == 0 then 
+                    
                     return 
                 end 
 				for i=1,#actiontable do 
                     if Threads_Alive[actiontable[i]] and Threads_Functions[actiontable[i]] and Threads_Timers[actiontable[i]] == timer then 
                         Threads_Functions[actiontable[i]](actiontable[i],#actiontable)
                     else 
-                        if Threads_ActionTables[timer] and Threads_ActionTables[timer][i] then table.remove(Threads_ActionTables[timer] ,i) end 
+                        if Threads_ActionTables[timer] and Threads_ActionTables[timer][i] then 
+                            table.remove(Threads_ActionTables[timer] ,i) 
+                            if #actiontable == 0 then 
+                                
+                                Threads.KillLoop(name,timer)
+                                return 
+                            end 
+                        end 
                     end 
 				end 
             end 
@@ -102,6 +109,7 @@ Threads.CreateLoop = function(...)
 end
 
 Threads.CreateLoopOnce = function(...) 
+    
     local tbl = {...}
     local length = #tbl
     local func,timer,name
@@ -124,8 +132,20 @@ Threads.CreateLoopOnce = function(...)
         Threads_Once[name] = true 
     end 
 end
+
+Threads.KillLoop = function(name,timer)
+    Threads_Alive[name] = nil 
+    Threads_Functions[name] = nil
+    Threads_Timers[name] = nil 
+    Threads_ActionTables[timer] = nil	
+    Threads_Once[name]  = nil
+    collectgarbage("collect")
+end 
+
 Threads.KillActionOfLoop = function(name)
-    Threads_Alive[name] = false 
+    Threads_Alive[name] = nil 
+    Threads_Once[name] = nil 
+    collectgarbage("collect")
 end 
 
 
@@ -187,7 +207,7 @@ Threads.loop2_custom = function(_name,_timer,_func,_varname)
                 --if not loadWait then 
                     --Wait(0)
                 --end 
-                if debuglog then print("Timer:"..timer,"Exist action threads total:"..#actiontable) end
+                --if debuglog then print("Timer:"..timer,"Exist action threads total:"..#actiontable) end
                 if #actiontable == 0 then 
                     return 
                 end 
@@ -198,7 +218,15 @@ Threads.loop2_custom = function(_name,_timer,_func,_varname)
                         
                         Threads_Custom_Functions[actiontable[i]](_varname and delaySetter,actiontable[i],#actiontable or actiontable[i],#actiontable)
                     else 
-                        if Threads_Custom_ActionTables[timer] and Threads_Custom_ActionTables[timer][i] then table.remove(Threads_Custom_ActionTables[timer] ,i) end 
+                        if Threads_Custom_ActionTables[timer] and Threads_Custom_ActionTables[timer][i] then 
+                            table.remove(Threads_Custom_ActionTables[timer] ,i) 
+                            if #actiontable == 0 then 
+                                
+                                Threads.KillLoopCustom(name,timer)
+                                return 
+                            end 
+                        end 
+                    
                     end 
 				end 
             end 
@@ -245,6 +273,7 @@ Threads.CreateLoopCustom = function(...) --actionname,defaulttimer(and ID of tim
 end
 
 Threads.CreateLoopOnceCustom = function(...) 
+    
     local tbl = {...}
     local length = #tbl
     local func,varname,name,defaulttimer
@@ -266,6 +295,7 @@ Threads.CreateLoopOnceCustom = function(...)
         defaulttimer = 0
         func = tbl[1]
     end 
+    if not Threads_Custom_Once[name] then 
     if not varname then 
         --error("Threads.CreateLoopCustom(actionname,defaulttimer,func,varname)") 
         local shash = tostring(debug.getinfo(2,'S').source)..'line'..tostring(debug.getinfo(2).currentline)
@@ -278,8 +308,8 @@ Threads.CreateLoopOnceCustom = function(...)
         print('threads:CreateLoopOnceCustom:Varname:'..varname,"actionname: ".. name) 
     end
     
-    if not Threads_Custom_Once[name] then 
-        if debuglog then print('threads:CreateLoopOnce:CreateThread:'..timer, name) end
+    
+        if debuglog then print('threads:CreateLoopOnce:CreateThread:'..defaulttimer, name) end
         Threads.loop2_custom(name,defaulttimer,func,varname)
         Threads_Custom_Once[name] = true 
     end 
@@ -295,8 +325,18 @@ Threads.SetLoopCustom = function(varname,totimer)
     Threads_Custom_VarTimer[varname] = totimer 
 end 
 
+Threads.KillLoopCustom = function(name,timer)
+    Threads_Custom_Alive[name] = nil 
+    Threads_Custom_Functions[name] = nil
+    Threads_Custom_Timers[name] = nil 
+    Threads_Custom_ActionTables[timer] = nil	
+    Threads_Custom_Once[name]  = nil
+    collectgarbage("collect")
+end 
+
 Threads.KillActionOfLoopCustom = function(name)
     Threads_Custom_Alive[name] = false 
+    Threads_Custom_Once[name] = false 
 end 
 
 
