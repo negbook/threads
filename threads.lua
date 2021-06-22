@@ -314,6 +314,7 @@ Threads.CreateLoopOnceCustom = function(...)
         Threads_Custom_Once[name] = true 
     end 
 end
+Threads.CreateLoopCustomOnce =  Threads.CreateLoopOnceCustom
 
 Threads.GetLoopCustom = function(varname)
     if not Threads_Custom_VarTimer[varname] then error("VarTimer not found.Make sure set varname in the last of Threads.CreateLoopCustom(actionname,defaulttimer,func,varname)",2) end 
