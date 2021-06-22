@@ -339,7 +339,18 @@ Threads.KillActionOfLoopCustom = function(name)
     Threads_Custom_Once[name] = false 
 end 
 
-
+Threads_OnceThread = {}
+Threads.CreateThreadOnce = function(fn)
+    if Threads_OnceThread[tostring(fn)] then 
+        return 
+    end 
+    Threads_OnceThread[tostring(fn)] = true
+    CreateThread(fn)
+end 
+Threads.ClearThreadOnce = function(name)
+    Threads_OnceThread[name] = nil 
+    collectgarbage("collect")
+end 
 
 Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
     if debuglog then print('threads:CreateLoad:'..thing) end
