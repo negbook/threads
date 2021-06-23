@@ -1,15 +1,6 @@
 Threads = {}
 debuglog = false
 busyspin = true
-Threads_Total = 0
-local _CreateThread = CreateThread
-local CreateThread = function(...)
-    Threads_Total = Threads_Total + 1
-    if debuglog then 
-    print('CreateThread Total By Threads:'..Threads_Total.." on "..GetCurrentResourceName())
-    end 
-    return _CreateThread(...)
-end 
 
 Threads_Custom_Alive = {}
 Threads_Custom_Timers = {}
@@ -39,6 +30,7 @@ Threads.loop2_custom = function(_name,_timer,_func,_varname)
 		if Threads_Custom_Functions[name] then 
             print('[Warning]Threads'..name..' is doubly and replaced')  
         end 
+       
         Threads_Custom_Alive[name] = true 
         Threads_Custom_Functions[name] = _func
         Threads_Custom_Timers[name] = timer 
@@ -48,21 +40,20 @@ Threads.loop2_custom = function(_name,_timer,_func,_varname)
 		table.insert(Threads_Custom_ActionTables[timer] , name)
 		CreateThread(function() 
 			while true do
-                if _varname and Threads_Custom_VarTimer[_varname] then 
-                    vt = Threads_Custom_VarTimer[_varname]
-                end 
-                Wait(vt>0 and vt or 0)
+                
                 if #actiontable == 0 then 
                     return 
                 end 
 				for i=1,#actiontable do 
-                    if Threads_Custom_Alive[actiontable[i]] and Threads_Custom_Functions[actiontable[i]] and Threads_Custom_Timers[actiontable[i]] == timer then 
+                    local v = actiontable[i]
+                    if Threads_Custom_Alive[v] and Threads_Custom_Functions[v] and Threads_Custom_Timers[v] == timer then 
                         local predelaySetter = {setter=setmetatable({},{__call = function(t,data) Threads.SetLoopCustom(_varname,data) end}),getter=function(t,data) return Threads.GetLoopCustom(_varname) end}
                         local delaySetter = predelaySetter
-                        Threads_Custom_Functions[actiontable[i]](_varname and delaySetter,actiontable[i],#actiontable or actiontable[i],#actiontable,Threads_Total)
+                         
+                        Threads_Custom_Functions[v](_varname and delaySetter,v,#actiontable or v,#actiontable)
                     else 
-                        if Threads_Custom_ActionTables[timer] and Threads_Custom_ActionTables[timer][i] then 
-                            table.remove(Threads_Custom_ActionTables[timer] ,i) 
+                        if actiontable and actiontable[i] then 
+                            table.remove(actiontable ,i) 
                             if #actiontable == 0 then 
                                 Threads.KillLoopCustom(name,timer)
                                 return 
@@ -70,6 +61,10 @@ Threads.loop2_custom = function(_name,_timer,_func,_varname)
                         end 
                     end 
 				end 
+                if _varname and Threads_Custom_VarTimer[_varname] then 
+                    vt = Threads_Custom_VarTimer[_varname]
+                end 
+                Wait(vt>0 and vt or 0)
             end 
             return 
 		end)
@@ -163,7 +158,6 @@ Threads.KillLoopCustom = function(name,timer)
     Threads_Custom_Timers[name] = nil 
     Threads_Custom_ActionTables[timer] = nil	
     Threads_Custom_Once[name]  = nil
-    collectgarbage("collect")
     if debuglog then print('threads:KillLoopCustom:'..name,timer) end
 end 
 Threads.KillActionOfLoopCustom = function(name)
@@ -224,7 +218,6 @@ Threads.CreateThreadOnce = function(fn)
 end 
 Threads.ClearThreadOnce = function(name)
     Threads_OnceThread[name] = nil 
-    collectgarbage("collect")
 end 
 Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
     if debuglog then print('threads:CreateLoad:'..thing) end
@@ -306,17 +299,20 @@ Threads.loop2 = function(_name,_timer,_func)
 		table.insert(Threads_ActionTables[timer] , name)
 		CreateThread(function() 
 			while true do
-                Wait(vt)
+                
+                
                 if #actiontable == 0 then 
                     return 
                 end 
+                
 				for i=1,#actiontable do 
-                    if Threads_Alive[actiontable[i]] and Threads_Functions[actiontable[i]] and Threads_Timers[actiontable[i]] == timer then 
-                        Threads_Functions[actiontable[i]](actiontable[i],#actiontable,Threads_Total)
+                    local v = actiontable[i]
+                    if Threads_Alive[v] and Threads_Functions[v] and Threads_Timers[v] == timer then 
+                        Threads_Functions[v](v,#actiontable)
                     else 
                         
-                        if Threads_ActionTables[timer] and Threads_ActionTables[timer][i] then 
-                            table.remove(Threads_ActionTables[timer] ,i) 
+                        if actiontable and actiontable[i] then 
+                            table.remove(actiontable ,i) 
                             if #actiontable == 0 then 
                                 Threads.KillLoop(name,timer)
                                 return 
@@ -324,6 +320,7 @@ Threads.loop2 = function(_name,_timer,_func)
                         end 
                     end 
 				end 
+                Wait(vt)
             end 
             return 
 		end)
@@ -384,7 +381,7 @@ Threads.KillLoop = function(name,timer)
     Threads_Timers[name] = nil 
     Threads_ActionTables[timer] = nil	
     Threads_Once[name]  = nil
-    collectgarbage("collect")
+
     if debuglog then print('threads:KillLoop:'..name,timer) end
 end 
 Threads.KillActionOfLoop = function(name)
@@ -404,6 +401,6 @@ Threads.KillActionOfLoop = function(name)
     Threads_Alive[name] = nil 
     Threads_Once[name] = nil 
     Threads_Functions[name] = nil
-    collectgarbage("collect")
+    
     if debuglog then print('threads:KillLoop:'..name) end
 end 
