@@ -177,6 +177,29 @@ end
 Threads.IsLoopAliveCustom = function(name)
     return Threads_Custom_Functions[name] and true or false 
 end 
+
+
+--debug 
+if debuglog then 
+local thisname = "threads"
+CreateThread(function()
+	if IsDuplicityVersion() then 
+		if GetCurrentResourceName() ~= thisname then 
+			print('\x1B[32m[server-utils]\x1B[0m'..thisname..' is used on '..GetCurrentResourceName().." \n\x1B[32m[\x1B[33m"..thisname.."\x1B[32m]\x1B[33m"..GetResourcePath(GetCurrentResourceName())..'\x1B[0m')
+		end 
+		RegisterServerEvent(thisname..':log')
+		AddEventHandler(thisname..':log', function(strings,sourcename)
+			print(strings.." player:"..GetPlayerName(source).." \n\x1B[32m[\x1B[33m"..thisname.."\x1B[32m]\x1B[33m"..GetResourcePath(sourcename)..'\x1B[0m')
+		end)
+	else 
+		if GetCurrentResourceName() ~= thisname then 
+			TriggerServerEvent(thisname..':log','\x1B[32m[client-utils]\x1B[0m'..thisname..'" is used on '..GetCurrentResourceName(),GetCurrentResourceName())
+		end 
+	end 
+end)
+end 
+
+
 Threads_OnceThread = {}
 Threads.CreateThreadOnce = function(fn)
     if Threads_OnceThread[tostring(fn)] then 
@@ -232,25 +255,6 @@ Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
         cb(nowcb)
     end 
 end
---debug 
-if debuglog then 
-local thisname = "threads"
-CreateThread(function()
-	if IsDuplicityVersion() then 
-		if GetCurrentResourceName() ~= thisname then 
-			print('\x1B[32m[server-utils]\x1B[0m'..thisname..' is used on '..GetCurrentResourceName().." \n\x1B[32m[\x1B[33m"..thisname.."\x1B[32m]\x1B[33m"..GetResourcePath(GetCurrentResourceName())..'\x1B[0m')
-		end 
-		RegisterServerEvent(thisname..':log')
-		AddEventHandler(thisname..':log', function(strings,sourcename)
-			print(strings.." player:"..GetPlayerName(source).." \n\x1B[32m[\x1B[33m"..thisname.."\x1B[32m]\x1B[33m"..GetResourcePath(sourcename)..'\x1B[0m')
-		end)
-	else 
-		if GetCurrentResourceName() ~= thisname then 
-			TriggerServerEvent(thisname..':log','\x1B[32m[client-utils]\x1B[0m'..thisname..'" is used on '..GetCurrentResourceName(),GetCurrentResourceName())
-		end 
-	end 
-end)
-end 
 --stable:
 local function Threads_IsActionTableCreated(timer) return Threads_ActionTables[timer]  end 
 Threads_Alive = {}
@@ -296,6 +300,7 @@ Threads.loop2 = function(_name,_timer,_func)
                     if Threads_Alive[actiontable[i]] and Threads_Functions[actiontable[i]] and Threads_Timers[actiontable[i]] == timer then 
                         Threads_Functions[actiontable[i]](actiontable[i],#actiontable,Threads_Total)
                     else 
+                        
                         if Threads_ActionTables[timer] and Threads_ActionTables[timer][i] then 
                             table.remove(Threads_ActionTables[timer] ,i) 
                             if #actiontable == 0 then 
@@ -360,11 +365,6 @@ Threads.IsLoopAlive = function(name)
     return Threads_Functions[name] and true or false
 end 
 Threads.KillLoop = function(name,timer)
-    for i=1,#Threads_ActionTables[timer] do 
-        if Threads_ActionTables[timer][i] == name then 
-            table.remove(Threads_ActionTables[timer] ,i) 
-        end 
-    end 
     Threads_Alive[name] = nil 
     Threads_Functions[name] = nil
     Threads_Timers[name] = nil 
@@ -379,12 +379,17 @@ Threads.KillActionOfLoop = function(name)
             for i=1,#Threads_ActionTables[timer] do 
                 if Threads_ActionTables[timer][i] == name then 
                     table.remove(Threads_ActionTables[timer] ,i) 
+                    if #Threads_ActionTables[timer] == 0 then 
+                        Threads.KillLoop(name,timer)
+                        return 
+                    end 
                 end 
             end 
         end 
     end 
     Threads_Alive[name] = nil 
     Threads_Once[name] = nil 
+    Threads_Functions[name] = nil
     collectgarbage("collect")
     if debuglog then print('threads:KillLoop:'..name) end
 end 
