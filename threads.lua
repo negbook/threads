@@ -167,8 +167,22 @@ Threads.KillLoopCustom = function(name,timer)
     if debuglog then print('threads:KillLoopCustom:'..name,timer) end
 end 
 Threads.KillActionOfLoopCustom = function(name)
+    for timer,_name in pairs (Threads_Custom_ActionTables) do 
+        if _name == name then 
+            for i=1,#Threads_Custom_ActionTables[timer] do 
+                if Threads_Custom_ActionTables[timer][i] == name then 
+                    table.remove(Threads_Custom_ActionTables[timer] ,i) 
+                    if #Threads_Custom_ActionTables[timer] == 0 then 
+                        Threads.KillLoopCustom(name,timer)
+                        return 
+                    end 
+                end 
+            end 
+        end 
+    end 
     Threads_Custom_Alive[name] = false 
     Threads_Custom_Once[name] = false 
+    Threads_Custom_Functions[name] = nil
     if debuglog then print('threads:KillActionOfLoopCustom:'..name) end
 end 
 Threads.IsActionOfLoopAliveCustom = function(name)
