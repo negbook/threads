@@ -132,7 +132,9 @@ Threads.CreateLoopOnce = function(...)
         Threads_Once[name] = true 
     end 
 end
-
+Threads.IsActionOfLoopAlive = function(name)
+    return Threads_Alive[name] and true or false
+end 
 Threads.IsLoopAlive = function(name)
     return Threads_Functions[name] and true or false
 end 
@@ -347,7 +349,9 @@ Threads.KillActionOfLoopCustom = function(name)
     Threads_Custom_Once[name] = false 
     if debuglog then print('threads:KillActionOfLoopCustom:'..name) end
 end 
-
+Threads.IsActionOfLoopAliveCustom = function(name)
+    return Threads_Custom_Alive[name] and true or false 
+end 
 Threads.IsLoopAliveCustom = function(name)
     return Threads_Custom_Functions[name] and true or false 
 end 
