@@ -133,6 +133,10 @@ Threads.CreateLoopOnce = function(...)
     end 
 end
 
+Threads.IsLoopAlive = function(name)
+    return Threads_Functions[name] and true or false
+end 
+
 Threads.KillLoop = function(name,timer)
     Threads_Alive[name] = nil 
     Threads_Functions[name] = nil
@@ -140,12 +144,14 @@ Threads.KillLoop = function(name,timer)
     Threads_ActionTables[timer] = nil	
     Threads_Once[name]  = nil
     collectgarbage("collect")
+    if debuglog then print('threads:KillLoop:'..name,timer) end
 end 
 
 Threads.KillActionOfLoop = function(name)
     Threads_Alive[name] = nil 
     Threads_Once[name] = nil 
     collectgarbage("collect")
+    if debuglog then print('threads:KillLoop:'..name) end
 end 
 
 
@@ -333,11 +339,17 @@ Threads.KillLoopCustom = function(name,timer)
     Threads_Custom_ActionTables[timer] = nil	
     Threads_Custom_Once[name]  = nil
     collectgarbage("collect")
+    if debuglog then print('threads:KillLoopCustom:'..name,timer) end
 end 
 
 Threads.KillActionOfLoopCustom = function(name)
     Threads_Custom_Alive[name] = false 
     Threads_Custom_Once[name] = false 
+    if debuglog then print('threads:KillActionOfLoopCustom:'..name) end
+end 
+
+Threads.IsLoopAliveCustom = function(name)
+    return Threads_Custom_Functions[name] and true or false 
 end 
 
 Threads_OnceThread = {}
