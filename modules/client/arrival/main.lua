@@ -108,14 +108,6 @@ Arrival.AddPosition = function (actionname,data,rangeorcb,_cb)
     Arrival.AddPositions(actionname,{data},rangeorcb,_cb)
 end 
 
-exports('AddPositions', function(...) --exports.threads:AddPositions
-  Arrival.AddPositions(...)
-end)
-
-exports('AddPosition', function(actionname,data,rangeorcb,_cb)  --exports.threads:AddPosition
-  Arrival.AddPosition(actionname,data,rangeorcb,_cb)
-end)
-
 Arrival.getnearzones = function(...)
     local _pos = {...}
     if #{...} == 3 then 
@@ -262,7 +254,13 @@ Arrival.GetHashMethod = function(x,y,z,range)
     return result 
 end 
 
+exports('AddPositions', function(...) --exports.threads:AddPositions
+  Arrival.AddPositions(...)
+end)
 
+exports('AddPosition', function(actionname,data,rangeorcb,_cb)  --exports.threads:AddPosition
+  Arrival.AddPosition(actionname,data,rangeorcb,_cb)
+end)
 
 --debug 
 --[======[
