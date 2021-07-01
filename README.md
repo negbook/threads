@@ -55,3 +55,10 @@ Threads.CreateLoopCustom("CheckCustomGetSet",3000,function(delay,name,total)
 end)
 
 ```
+
+[Modules]
+```
+Threads.AddPositions
+Threads.AddPosition 
+```
+[EXAMPLE](https://github.com/negbook/-threads-example-new_banking)
