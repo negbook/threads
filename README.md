@@ -56,7 +56,8 @@ end)
 
 ```
 
-[Modules]
+[Modules : Arrival]  
+Add positions and callback when you arrived that place. recommanded range <=5.0
 ```
 Threads.AddPositions
 Threads.AddPosition 
