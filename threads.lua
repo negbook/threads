@@ -45,22 +45,24 @@ Threads.loop2_custom = function(_name,_timer,_func,_varname)
                     return 
                 end 
 				for i=1,#actiontable do 
-                    CreateThread(function() 
+                    local function this()
                     local v = actiontable[i]
-                    if Threads_Custom_Alive[v] and Threads_Custom_Functions[v] and Threads_Custom_Timers[v] == timer then 
-                        local predelaySetter = {setter=setmetatable({},{__call = function(t,data) Threads.SetLoopCustom(_varname,data) end}),getter=function(t,data) return Threads.GetLoopCustom(_varname) end}
-                        local delaySetter = predelaySetter
-                        Threads_Custom_Functions[v](_varname and delaySetter,v,#actiontable or v,#actiontable)
-                    else 
-                        if actiontable and actiontable[i] then 
-                            table.remove(actiontable ,i) 
-                            if #actiontable == 0 then 
-                                Threads.KillLoopCustom(name,timer)
-                                return 
+                        if Threads_Custom_Alive[v] and Threads_Custom_Functions[v] and Threads_Custom_Timers[v] == timer then 
+                            local predelaySetter = {setter=setmetatable({},{__call = function(t,data) Threads.SetLoopCustom(_varname,data) end}),getter=function(t,data) return Threads.GetLoopCustom(_varname) end}
+                            local delaySetter = predelaySetter
+                            Threads_Custom_Functions[v](_varname and delaySetter,v,#actiontable or v,#actiontable)
+                        else 
+                            if actiontable and actiontable[i] then 
+                                table.remove(actiontable ,i) 
+                                if #actiontable == 0 then 
+                                    Threads.KillLoopCustom(name,timer)
+                                    return 
+                                end 
                             end 
                         end 
                     end 
-                    end)
+                    this()
+                    
 				end 
                 if _varname and Threads_Custom_VarTimer[_varname] then 
                     vt = Threads_Custom_VarTimer[_varname]
@@ -307,21 +309,23 @@ Threads.loop2 = function(_name,_timer,_func)
                 end 
                 
 				for i=1,#actiontable do 
-                    CreateThread(function() 
-                    local v = actiontable[i]
-                    if Threads_Alive[v] and Threads_Functions[v] and Threads_Timers[v] == timer then 
-                        Threads_Functions[v](v,#actiontable)
-                    else 
-                        
-                        if actiontable and actiontable[i] then 
-                            table.remove(actiontable ,i) 
-                            if #actiontable == 0 then 
-                                Threads.KillLoop(name,timer)
-                                return 
+                    local function this()
+                        local v = actiontable[i]
+                        if Threads_Alive[v] and Threads_Functions[v] and Threads_Timers[v] == timer then 
+                            Threads_Functions[v](v,#actiontable)
+                        else 
+                            
+                            if actiontable and actiontable[i] then 
+                                table.remove(actiontable ,i) 
+                                if #actiontable == 0 then 
+                                    Threads.KillLoop(name,timer)
+                                    return 
+                                end 
                             end 
                         end 
                     end 
-                    end )
+                    this()
+                    
 				end 
                 Wait(vt)
             end 
