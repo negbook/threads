@@ -3,4 +3,15 @@ games {'gta5'}
 
 description 'Threads'
 
-shared_script 'threads.lua'
+client_scripts 
+{
+    'threads.lua',
+    'modules/client/**/*.lua'
+    
+}
+
+server_scripts
+{
+    'threads.lua',
+    'modules/server/**/*.lua'
+}

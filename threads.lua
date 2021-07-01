@@ -411,3 +411,11 @@ Threads.KillActionOfLoop = function(name)
     
     if debuglog then print('threads:KillLoop:'..name) end
 end 
+
+Threads.AddPositions = function(actionname,datas,rangeorcb,_cb)
+    exports.threads:AddPositions(actionname,datas,rangeorcb,_cb)
+end 
+
+Threads.AddPosition = function(actionname,data,rangeorcb,_cb)
+    exports.threads:AddPosition(actionname,data,rangeorcb,_cb)
+end 
