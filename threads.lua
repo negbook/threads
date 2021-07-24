@@ -442,10 +442,14 @@ Threads.KillHandleOfLoop = function(handle)
     end 
 end 
 
-Threads.AddPositions = function(actionname,datas,rangeorcb,_cb)
-    exports.threads:AddPositions(actionname,datas,rangeorcb,_cb)
-end 
+if GetResourceState("threads")=="started" or GetResourceState("threads")=="starting" then 
+    Threads.AddPositions = function(actionname,datas,rangeorcb,_cb)
+        exports.threads:AddPositions(actionname,datas,rangeorcb,_cb)
+    end 
 
-Threads.AddPosition = function(actionname,data,rangeorcb,_cb)
-    exports.threads:AddPosition(actionname,data,rangeorcb,_cb)
+    Threads.AddPosition = function(actionname,data,rangeorcb,_cb)
+        exports.threads:AddPosition(actionname,data,rangeorcb,_cb)
+    end 
+else 
+    print("Due to local sciprts,Threads:Arrivals module is disabled.")
 end 
