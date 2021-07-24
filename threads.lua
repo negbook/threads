@@ -2,6 +2,8 @@ Threads = {}
 debuglog = false
 busyspin = true
 
+Threads_Custom_Handle = 0
+Threads_Custom_Handles = {}
 Threads_Custom_Alive = {}
 Threads_Custom_Timers = {}
 Threads_Custom_VarTimer = {}
@@ -107,6 +109,10 @@ Threads.CreateLoopCustom = function(...) --actionname,defaulttimer(and ID of tim
         print('threads:CreateLoopCustom:Varname:'..varname,"actionname: ".. name) 
     end
     Threads.loop2_custom(name,defaulttimer,func,varname)
+    if Threads_Custom_Handle >= 65530 then Threads_Custom_Handle = 0 end 
+    Threads_Custom_Handle = Threads_Custom_Handle + 1
+    Threads_Custom_Handles[Threads_Custom_Handle] = name
+    return Threads_Custom_Handle
 end
 Threads.CreateLoopOnceCustom = function(...) 
     local tbl = {...}
@@ -145,6 +151,10 @@ Threads.CreateLoopOnceCustom = function(...)
         Threads.loop2_custom(name,defaulttimer,func,varname)
         Threads_Custom_Once[name] = true 
     end 
+    if Threads_Custom_Handle >= 65530 then Threads_Custom_Handle = 0 end 
+    Threads_Custom_Handle = Threads_Custom_Handle + 1
+    Threads_Custom_Handles[Threads_Custom_Handle] = name
+    return Threads_Custom_Handle
 end
 Threads.CreateLoopCustomOnce =  Threads.CreateLoopOnceCustom
 Threads.GetLoopCustom = function(varname)
@@ -181,6 +191,11 @@ Threads.KillActionOfLoopCustom = function(name)
     Threads_Custom_Once[name] = false 
     Threads_Custom_Functions[name] = nil
     if debuglog then print('threads:KillActionOfLoopCustom:'..name) end
+end 
+Threads.KillHandleOfLoopCustom = function(handle)
+    if Threads_Custom_Handle[handle] then 
+        Threads.KillActionOfLoopCustom(Threads_Custom_Handle[handle])
+    end 
 end 
 Threads.IsActionOfLoopAliveCustom = function(name)
     return Threads_Custom_Alive[name] and true or false 
@@ -267,6 +282,8 @@ Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
 end
 --stable:
 local function Threads_IsActionTableCreated(timer) return Threads_ActionTables[timer]  end 
+Threads_Handle = 0
+Threads_Handles = {}
 Threads_Alive = {}
 Threads_Timers = {}
 Threads_Functions = {}
@@ -352,6 +369,10 @@ Threads.CreateLoop = function(...)
     end 
     if debuglog then print('threads:CreateLoop:CreateThread:'..timer, name) end
     Threads.loop2(name,timer,func)
+    if Threads_Handle >= 65530 then Threads_Handle = 0 end 
+    Threads_Handle = Threads_Handle + 1
+    Threads_Handles[Threads_Handle] = name
+    return Threads_Handle
 end
 Threads.CreateLoopOnce = function(...) 
     local tbl = {...}
@@ -375,6 +396,10 @@ Threads.CreateLoopOnce = function(...)
         Threads.loop2(name,timer,func)
         Threads_Once[name] = true 
     end 
+    if Threads_Handle >= 65530 then Threads_Handle = 0 end 
+    Threads_Handle = Threads_Handle + 1
+    Threads_Handles[Threads_Handle] = name
+    return Threads_Handle
 end
 Threads.IsActionOfLoopAlive = function(name)
     return Threads_Alive[name] and true or false
@@ -410,6 +435,11 @@ Threads.KillActionOfLoop = function(name)
     Threads_Functions[name] = nil
     
     if debuglog then print('threads:KillLoop:'..name) end
+end 
+Threads.KillHandleOfLoop = function(handle)
+    if Threads_Handles[handle] then 
+        Threads.KillActionOfLoop(Threads_Handles[handle])
+    end 
 end 
 
 Threads.AddPositions = function(actionname,datas,rangeorcb,_cb)
