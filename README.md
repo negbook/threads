@@ -56,7 +56,7 @@ end)
 
 ```
 
-[Modules : Arrival]  
+[Modules : Arrival][EXAMPLE](https://github.com/negbook/-threads-example-new_banking)   
 Add positions and callback when you arrived that place. recommanded range <=5.0
 ```
 Threads.AddPositions
@@ -75,4 +75,4 @@ Threads.Scaleforms.DrawPosition2
 Threads.Scaleforms.DrawPositionDuration
 Threads.Scaleforms.DrawPosition2Duration
 ```
-[EXAMPLE](https://github.com/negbook/-threads-example-new_banking)
+
