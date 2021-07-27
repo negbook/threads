@@ -71,7 +71,7 @@ Threads.TweenCFX.delayCall (object, duration, vars) --from something to the end 
 ```
 
 
-[Modules : Arrival(this modules dependency with Threads script)]  
+[Modules : Arrival]  (this modules dependency with starting Threads script)  
 Add positions and callback when you arrived that place. recommanded range <=5.0
 ```
 Threads.AddPositions
@@ -79,7 +79,7 @@ Threads.AddPosition
 ```
 [EXAMPLE](https://github.com/negbook/-threads-example-new_banking)  
 
-[Modules : Scaleforms(this modules dependency with Threads script)]  
+[Modules : Scaleforms]  (this modules dependency with starting Threads script)  
 ```
 Threads.Scaleforms.Call
 Threads.Scaleforms.Draw
