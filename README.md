@@ -1,7 +1,7 @@
 # fxserver-threads
 Threads utilities for FXServer
 
-[INSTALLATION]
+# INSTALLATION
 
 Set it as a dependency in you fxmanifest.lua
 Set debuglog = false in threads.lua if you dont want any rubbish message
@@ -10,7 +10,7 @@ Set debuglog = false in threads.lua if you dont want any rubbish message
 client_script '@threads/threads.lua'
 ```
 
-[DESCRIPTION]
+# DESCRIPTION
 
 A new Thread.CreateLoop make a CreateThread(function Wait(x) end) loop 
 Auto add a action into the while loop Threads.CreateLoop(actionname,millisecondID,...
@@ -34,7 +34,7 @@ Threads.CreateLoopOnceCustom
 Threads.SetLoopCustom
 Threads.GetLoopCustom
 ```
-[EXAMPLE]
+# EXAMPLE
 ```
 
 Threads.CreateLoop("Check",0,function(name)
@@ -62,7 +62,7 @@ Threads.CreateLoopCustom("CheckCustomGetSet",3000,function(delay,name,total)
 end)
 
 ```
-[Modules : Tween]
+# Modules : Tween
 ```
 Threads.TweenCFX.removeTween (object)  --cancel a tween
 Threads.TweenCFX.endTween (object, forceComplete)  --force to the end of tween
@@ -71,7 +71,7 @@ Threads.TweenCFX.delayCall (object, duration, vars) --from something to the end 
 ```
 
 
-[Modules : Arrival]  (this modules dependency with starting Threads script)  
+# Modules : Arrival  (this modules dependency with starting Threads script)  
 Add positions and callback when you arrived that place. recommanded range <=5.0
 ```
 Threads.AddPositions
@@ -79,7 +79,7 @@ Threads.AddPosition
 ```
 [EXAMPLE](https://github.com/negbook/-threads-example-new_banking)  
 
-[Modules : Scaleforms]  (this modules dependency with starting Threads script)  
+# Modules : Scaleforms  (this modules dependency with starting Threads script)  
 ```
 Threads.Scaleforms.Call
 Threads.Scaleforms.Draw
