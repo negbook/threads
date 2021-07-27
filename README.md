@@ -70,4 +70,17 @@ Add positions and callback when you arrived that place. recommanded range <=5.0
 Threads.AddPositions
 Threads.AddPosition 
 ```
-[EXAMPLE](https://github.com/negbook/-threads-example-new_banking)
+[EXAMPLE](https://github.com/negbook/-threads-example-new_banking)  
+
+[Modules : Scaleforms]  
+```
+Threads.Scaleforms.Call
+Threads.Scaleforms.Draw
+Threads.Scaleforms.DrawDuration
+Threads.Scaleforms.End
+Threads.Scaleforms.RequestCallback
+Threads.Scaleforms.DrawPosition
+Threads.Scaleforms.DrawPosition2
+Threads.Scaleforms.DrawPositionDuration
+Threads.Scaleforms.DrawPosition2Duration
+```
