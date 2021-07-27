@@ -24,7 +24,20 @@ also you can get the actionname and the total loops when debug by ```Threads.Cre
 or ```Threads.CreateLoopCustom(actionname,0,function(delay,name,total) print(name,total) delay.setter(3000*math.random()) end)```
 
 Threads.xxxxCustom is just different with Threads.xxxx by a setter and getter .
-You can also pass a Varname into Threads.xxxxCustom params 4  so that you can using Threads.GetLoopCustom and Threads.SetLoopCustom
+You can also pass a Varname into Threads.xxxxCustom params 4  so that you can using Threads.GetLoopCustom and Threads.SetLoopCustom  
+
+## Tween 
+Tween some properties value of a lua table. It can be tbl.x tbl.y tbl.z tbl.alpha tbl.height tbl.width etc...  
+
+## Arrival 
+Detect if you arrival somewhere positions.It can be a table array or just a position data.  
+When you arrived,callback a data relative to the raw position data.
+
+## Scaleforms 
+When you draw a scaleforms. It will drawing with Threads script.The perfromances is only effected in Threads script.  
+So you can directly know how you spent your CPU usage with drawing scaleforms.  
+
+
 
 ```
 Threads.CreateLoop
