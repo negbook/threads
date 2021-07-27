@@ -712,8 +712,8 @@ local TweenCFX = {}
        return this
     end })
     
-Threads.TweenCFX = TweenCFX
-
+Threads.TweenCFX = TweenCFX.Tween
+Threads.TweenCFX.Ease = TweenCFX.Ease
 
 if GetResourceState("threads")=="started" or GetResourceState("threads")=="starting" then 
     Threads.AddPositions = function(actionname,datas,rangeorcb,_cb)
