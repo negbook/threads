@@ -26,7 +26,14 @@ or ```Threads.CreateLoopCustom(actionname,0,function(delay,name,total) print(nam
 Threads.xxxxCustom is just different with Threads.xxxx by a setter and getter .
 You can also pass a Varname into Threads.xxxxCustom params 4  so that you can using Threads.GetLoopCustom and Threads.SetLoopCustom
 
-
+```
+Threads.CreateLoop
+Threads.CreateLoopOnce
+Threads.CreateLoopCustom
+Threads.CreateLoopOnceCustom
+Threads.SetLoopCustom
+Threads.GetLoopCustom
+```
 [EXAMPLE]
 ```
 
