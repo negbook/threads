@@ -10,7 +10,7 @@ Set debuglog = false in threads.lua if you dont want any rubbish message
 client_script '@threads/threads.lua'
 ```
 
-It is recommended starting the threads scripts in resource.cfg
+It is recommended starting the threads script in resource.cfg
 So that you can using Scaleforms and Arrival modules.
 
 # DESCRIPTION
