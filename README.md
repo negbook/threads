@@ -24,7 +24,7 @@ But the Threads.CreateLoopCustom does not group the loops and always create a ne
 also you can get the actionname and the total loops if you want to debug something ```Threads.CreateLoop(actionname,millisecondID,function(name,totalofloops) print(name,totalofloops) end)```  
 or ```Threads.CreateLoopCustom(actionname,0,function(delay,name,total) print(name,total) delay.setter(3000*math.random()) end)```  
   
-Threads.xxxxCustom is just different with Threads.xxxx with a setter and getter .  
+With a setter and getter,Threads.xxxxCustom can be set dynamic wait time for the next loop  .  
 You can also pass a Varname into Threads.xxxxCustom params 4  so that you can using Threads.GetLoopCustom and Threads.SetLoopCustom    
 
 ```
