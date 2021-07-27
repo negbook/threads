@@ -19,7 +19,7 @@ Auto delete and break the while loop when all those actions in that while loop h
   
 You can create a custom Loop which can be set or get the delay of next loop with the cb.setter or cb.getter  
 ```Threads.CreateLoopCustom(actionname,0,function(delay) delay.setter(3000) end)```  
-But the Threads.CreateLoopCustom does not group and always create a new thread with CreateThread
+But the Threads.CreateLoopCustom does not group the loops and always create a new CreateThread while loop
   
 also you can get the actionname and the total loops if you want to debug something ```Threads.CreateLoop(actionname,millisecondID,function(name,totalofloops) print(name,totalofloops) end)```  
 or ```Threads.CreateLoopCustom(actionname,0,function(delay,name,total) print(name,total) delay.setter(3000*math.random()) end)```  
