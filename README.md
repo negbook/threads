@@ -55,6 +55,14 @@ Threads.CreateLoopCustom("CheckCustomGetSet",3000,function(delay,name,total)
 end)
 
 ```
+[Modules : Tween]
+```
+Threads.TweenCFX.removeTween (object)  --cancel a tween
+Threads.TweenCFX.endTween (object, forceComplete)  --force to the end of tween
+Threads.TweenCFX.to (object, duration, vars)  --from something to the end such as alpha
+Threads.TweenCFX.delayCall (object, duration, vars) --from something to the end such as alpha but not change/tween anything.
+```
+
 
 [Modules : Arrival]  
 Add positions and callback when you arrived that place. recommanded range <=5.0
