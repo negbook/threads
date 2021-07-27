@@ -26,19 +26,6 @@ or ```Threads.CreateLoopCustom(actionname,0,function(delay,name,total) print(nam
 Threads.xxxxCustom is just different with Threads.xxxx by a setter and getter .
 You can also pass a Varname into Threads.xxxxCustom params 4  so that you can using Threads.GetLoopCustom and Threads.SetLoopCustom  
 
-## Tween 
-Tween some properties value of a lua table. It can be tbl.x tbl.y tbl.z tbl.alpha tbl.height tbl.width etc...  
-
-## Arrival 
-Detect if you arrival somewhere positions.It can be a table array or just a position data.  
-When you arrived,callback a data relative to the raw position data.
-
-## Scaleforms 
-When you draw a scaleforms. It will drawing with Threads script.The perfromances is only effected in Threads script.  
-So you can directly know how you spent your CPU usage with drawing scaleforms.  
-
-
-
 ```
 Threads.CreateLoop
 Threads.CreateLoopOnce
@@ -47,7 +34,7 @@ Threads.CreateLoopOnceCustom
 Threads.SetLoopCustom
 Threads.GetLoopCustom
 ```
-# EXAMPLE
+### EXAMPLE
 ```
 
 Threads.CreateLoop("Check",0,function(name)
@@ -75,7 +62,8 @@ Threads.CreateLoopCustom("CheckCustomGetSet",3000,function(delay,name,total)
 end)
 
 ```
-# Modules : Tween
+## Modules : Tween  
+Tween some properties value of a lua table. It can be tbl.x tbl.y tbl.z tbl.alpha tbl.height tbl.width etc...  
 ```
 Threads.TweenCFX.removeTween (object)  --cancel a tween
 Threads.TweenCFX.endTween (object, forceComplete)  --force to the end of tween
@@ -84,15 +72,20 @@ Threads.TweenCFX.delayCall (object, duration, vars) --from something to the end 
 ```
 
 
-# Modules : Arrival  (dependency with starting Threads script)  
-Add positions and callback when you arrived that place. recommanded range <=5.0
+## Modules : Arrival  (dependency with starting Threads script)   
+Add positions and callback when you arrived that place. recommanded range <=5.0  
+Detect if you arrival somewhere positions.It can be a table array or just a position data.  
+When you arrived,callback a data relative to the raw position data.
+
 ```
 Threads.AddPositions
 Threads.AddPosition 
 ```
 [EXAMPLE](https://github.com/negbook/-threads-example-new_banking)  
 
-# Modules : Scaleforms  (dependency with starting Threads script)  
+## Modules : Scaleforms  (dependency with starting Threads script)    
+When you draw a scaleforms. It will drawing with Threads script.The perfromances is only effected in Threads script.  
+So you can directly know how you spent your CPU usage with drawing scaleforms.  
 ```
 Threads.Scaleforms.Call
 Threads.Scaleforms.Draw
