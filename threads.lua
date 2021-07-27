@@ -450,6 +450,94 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
     Threads.AddPosition = function(actionname,data,rangeorcb,_cb)
         exports.threads:AddPosition(actionname,data,rangeorcb,_cb)
     end 
+    
+    this = {}
+    this.scriptName = "threads"
+    SendScaleformValues = function (...)
+        local tb = {...}
+        for i=1,#tb do
+            if type(tb[i]) == "number" then 
+                if math.type(tb[i]) == "integer" then
+                        ScaleformMovieMethodAddParamInt(tb[i])
+                else
+                        ScaleformMovieMethodAddParamFloat(tb[i])
+                end
+            elseif type(tb[i]) == "string" then ScaleformMovieMethodAddParamTextureNameString(tb[i])
+            elseif type(tb[i]) == "boolean" then ScaleformMovieMethodAddParamBool(tb[i])
+            end
+        end 
+    end
+
+    Threads.Scaleforms = {}
+    if GetCurrentResourceName() ~= this.scriptName then 
+    
+    ThisScriptsScaleforms = {}
+    end 
+
+    AddEventHandler('onResourceStop', function(resourceName)
+       
+      if (GetCurrentResourceName() ~= resourceName) then
+        return
+      end
+      --print(this.scriptName,resourceName,GetCurrentResourceName() ,ThisScriptsScaleforms)
+      --print('The resource ' .. resourceName .. ' was stopped.')
+      if resourceName ~= this.scriptName then 
+          for i,v in pairs( ThisScriptsScaleforms ) do 
+            --print(i,v)
+            Threads.Scaleforms.End(i)
+          end 
+      end 
+    end)
+
+    Threads.Scaleforms.Call = function(scaleformName,cb) 
+        if GetCurrentResourceName() ~= this.scriptName then 
+            ThisScriptsScaleforms[scaleformName] = true 
+        end 
+        local handle = exports.threads:CallScaleformMovie(scaleformName) 
+        local inputfunction = function(sfunc) PushScaleformMovieFunction(handle,sfunc) end
+        cb(inputfunction,SendScaleformValues,PopScaleformMovieFunctionVoid,handle)
+    end
+    Threads.Scaleforms.Draw = function(scaleformName,...)
+        exports.threads:DrawScaleformMovie(scaleformName,...)
+    end
+    Threads.Scaleforms.DrawDuration = function(scaleformName,duration,...)
+        exports.threads:DrawScaleformMovieDuration(scaleformName,duration,...)
+    end
+    Threads.Scaleforms.End = function(scaleformName)
+        exports.threads:EndScaleformMovie(scaleformName)
+    end; Threads.Scaleforms.Kill = Threads.Scaleforms.End
+    
+    Threads.Scaleforms.RequestCallback = function(scaleformName,SfunctionName,...) 
+        exports.threads:RequestScaleformCallbackAny(scaleformName,SfunctionName,...) 
+    end
+    
+    Threads.Scaleforms.DrawPosition = function(scaleformName,...) 
+        exports.threads:DrawScaleformMoviePosition(scaleformName,...) 
+    end
+    Threads.Scaleforms.DrawPosition2 = function(scaleformName,...) 
+        exports.threads:DrawScaleformMoviePosition2(scaleformName,...) 
+    end
+    Threads.Scaleforms.DrawPositionDuration = function(scaleformName,duration,...)
+        exports.threads:DrawScaleformMoviePositionDuration(scaleformName,duration,...)
+    end
+    Threads.Scaleforms.DrawPosition2Duration = function(scaleformName,duration,...)
+        exports.threads:DrawScaleformMoviePosition2Duration(scaleformName,duration,...)
+    end
+
+    Threads.Scaleforms.Draw3DSpeical = function(scaleformName,ped,...) 
+        exports.threads:DrawScaleformMovie3DSpeical(scaleformName,ped,...) 
+    end
+
+    Threads.Scaleforms.GetTotal = function()
+        return exports.threads:GetTotal()
+    end
+
+    Threads.Scaleforms.GetTween = function()
+        return exports.threads:GetTween()
+    end 
+    
+    
 else 
-    print("Due to local sciprts,Threads:Arrivals module is disabled.")
+    print("Threads:Due to local sciprts,modules is disabled.")
 end 
+
