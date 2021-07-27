@@ -19,7 +19,7 @@ Auto delete and break the while loop when all those actions in that while loop h
   
 You can create a custom Loop which can be set or get the delay of next loop with the cb.setter or cb.getter  
 ```Threads.CreateLoopCustom(actionname,0,function(delay) delay.setter(3000) end)```  
-But the Threads.CreateLoopCustom does not group the loops and always create a new CreateThread while loop
+But the Threads.CreateLoopCustom does not group the loops and always create a new CreateThread while loop  
 With a setter and getter,Threads.xxxxCustom can be set dynamic wait time for the next loop  .  
 You can also pass a Varname into Threads.xxxxCustom params 4  so that you can using Threads.GetLoopCustom and Threads.SetLoopCustom  
 to set the wait time in other place   
