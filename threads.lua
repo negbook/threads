@@ -532,7 +532,7 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
         return exports.threads:GetTotal()
     end
 
-    Threads.Scaleforms.GetTween = function()
+    Threads.GetTween = function()
         return exports.threads:GetTween()
     end 
     
