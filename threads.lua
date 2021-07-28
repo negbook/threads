@@ -289,6 +289,7 @@ Threads_Timers = {}
 Threads_Functions = {}
 Threads_Once = {}
 Threads_ActionTables = {}
+Threads.Break = function() end 
 Threads.loop = function()error("Outdated",2) end 
 Threads.loop2 = function(_name,_timer,_func)
     if Threads_Once[_name] then return end 
@@ -329,6 +330,7 @@ Threads.loop2 = function(_name,_timer,_func)
                     local function this()
                         local v = actiontable[i]
                         if Threads_Alive[v] and Threads_Functions[v] and Threads_Timers[v] == timer then 
+                            Threads.Break = function() if Threads.IsActionOfLoopAlive(v) then Threads.KillActionOfLoop(v) end end 
                             Threads_Functions[v](v,#actiontable)
                         else 
                             
