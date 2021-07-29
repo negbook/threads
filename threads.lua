@@ -729,121 +729,127 @@ Threads.TweenCFX = TweenCFX.Tween
 Threads.TweenCFX.Ease = TweenCFX.Ease
 
 if GetResourceState("threads")=="started" or GetResourceState("threads")=="starting" then 
-    Threads.AddPositions = function(actionname,datas,rangeorcb,_cb)
-        exports.threads:AddPositions(actionname,datas,rangeorcb,_cb)
-    end 
-
-    Threads.AddPosition = function(actionname,data,rangeorcb,_cb)
-        exports.threads:AddPosition(actionname,data,rangeorcb,_cb)
-    end 
-    
-    this = {}
-    this.scriptName = "threads"
-    SendScaleformValues = function (...)
-        local tb = {...}
-        for i=1,#tb do
-            if type(tb[i]) == "number" then 
-                if math.type(tb[i]) == "integer" then
-                        ScaleformMovieMethodAddParamInt(tb[i])
-                else
-                        ScaleformMovieMethodAddParamFloat(tb[i])
-                end
-            elseif type(tb[i]) == "string" then ScaleformMovieMethodAddParamTextureNameString(tb[i])
-            elseif type(tb[i]) == "boolean" then ScaleformMovieMethodAddParamBool(tb[i])
-            end
+    local isClient = function() return not IsDuplicityVersion() end 
+    local isServer = function() return IsDuplicityVersion() end 
+    if isClient() then --client
+        Threads.AddPositions = function(actionname,datas,rangeorcb,_cb)
+            exports.threads:AddPositions(actionname,datas,rangeorcb,_cb)
         end 
-    end
 
-    Threads.Scaleforms = {}
-    if GetCurrentResourceName() ~= this.scriptName then 
-        ThisScriptsScaleforms = {}
-    end 
-
-    AddEventHandler('onResourceStop', function(resourceName)
-       
-      if (GetCurrentResourceName() ~= resourceName) then
-        return
-      end
-      --print(this.scriptName,resourceName,GetCurrentResourceName() ,ThisScriptsScaleforms)
-      --print('The resource ' .. resourceName .. ' was stopped.')
-      if resourceName ~= this.scriptName then 
-          for i,v in pairs( ThisScriptsScaleforms ) do 
-            --print(i,v)
-            Threads.Scaleforms.End(i)
-          end 
-      end 
-    end)
-
-    Threads.Scaleforms.Call = function(scaleformName,cb) 
+        Threads.AddPosition = function(actionname,data,rangeorcb,_cb)
+            exports.threads:AddPosition(actionname,data,rangeorcb,_cb)
+        end 
         
-        local handle = exports.threads:CallScaleformMovie(scaleformName) 
-        local inputfunction = function(sfunc) PushScaleformMovieFunction(handle,sfunc) end
+        this = {}
+        this.scriptName = "threads"
+        SendScaleformValues = function (...)
+            local tb = {...}
+            for i=1,#tb do
+                if type(tb[i]) == "number" then 
+                    if math.type(tb[i]) == "integer" then
+                            ScaleformMovieMethodAddParamInt(tb[i])
+                    else
+                            ScaleformMovieMethodAddParamFloat(tb[i])
+                    end
+                elseif type(tb[i]) == "string" then ScaleformMovieMethodAddParamTextureNameString(tb[i])
+                elseif type(tb[i]) == "boolean" then ScaleformMovieMethodAddParamBool(tb[i])
+                end
+            end 
+        end
+
+        Threads.Scaleforms = {}
         if GetCurrentResourceName() ~= this.scriptName then 
-            if not ThisScriptsScaleforms[scaleformName] then 
-                ThisScriptsScaleforms[scaleformName] = true 
-                local num = Threads.Scaleforms.GetTotal()
-                if num > 0 then 
-                    print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+            ThisScriptsScaleforms = {}
+        end 
+
+        AddEventHandler('onResourceStop', function(resourceName)
+           
+          if (GetCurrentResourceName() ~= resourceName) then
+            return
+          end
+          --print(this.scriptName,resourceName,GetCurrentResourceName() ,ThisScriptsScaleforms)
+          --print('The resource ' .. resourceName .. ' was stopped.')
+          if resourceName ~= this.scriptName then 
+              for i,v in pairs( ThisScriptsScaleforms ) do 
+                --print(i,v)
+                Threads.Scaleforms.End(i)
+              end 
+          end 
+        end)
+
+        Threads.Scaleforms.Call = function(scaleformName,cb) 
+            
+            local handle = exports.threads:CallScaleformMovie(scaleformName) 
+            local inputfunction = function(sfunc) PushScaleformMovieFunction(handle,sfunc) end
+            if GetCurrentResourceName() ~= this.scriptName then 
+                if not ThisScriptsScaleforms[scaleformName] then 
+                    ThisScriptsScaleforms[scaleformName] = true 
+                    local num = Threads.Scaleforms.GetTotal()
+                    if num > 0 then 
+                        print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                    end 
                 end 
             end 
-        end 
-        cb(inputfunction,SendScaleformValues,PopScaleformMovieFunctionVoid,handle)
-    end
-    Threads.Scaleforms.Draw = function(scaleformName,...)
-        exports.threads:DrawScaleformMovie(scaleformName,...)
-    end
-    Threads.Scaleforms.DrawDuration = function(scaleformName,duration,...)
-        exports.threads:DrawScaleformMovieDuration(scaleformName,duration,...)
-    end
-    Threads.Scaleforms.End = function(scaleformName)
-        exports.threads:EndScaleformMovie(scaleformName)
-    end; Threads.Scaleforms.Kill = Threads.Scaleforms.End
-    
-    Threads.Scaleforms.RequestCallback = function(scaleformName,SfunctionName,...) 
-        exports.threads:RequestScaleformCallbackAny(scaleformName,SfunctionName,...) 
-    end
-    
-    Threads.Scaleforms.DrawPosition = function(scaleformName,...) 
-        exports.threads:DrawScaleformMoviePosition(scaleformName,...) 
-    end
-    Threads.Scaleforms.DrawPosition2 = function(scaleformName,...) 
-        exports.threads:DrawScaleformMoviePosition2(scaleformName,...) 
-    end
-    Threads.Scaleforms.DrawPositionDuration = function(scaleformName,duration,...)
-        exports.threads:DrawScaleformMoviePositionDuration(scaleformName,duration,...)
-    end
-    Threads.Scaleforms.DrawPosition2Duration = function(scaleformName,duration,...)
-        exports.threads:DrawScaleformMoviePosition2Duration(scaleformName,duration,...)
-    end
-
-    Threads.Scaleforms.Draw3DSpeical = function(scaleformName,ped,...) 
-        exports.threads:DrawScaleformMovie3DSpeical(scaleformName,ped,...) 
-    end
-
-    Threads.Scaleforms.GetTotal = function()
-        return exports.threads:GetTotal()
-    end
-    
-    if GetCurrentResourceName() == this.scriptName then 
+            cb(inputfunction,SendScaleformValues,PopScaleformMovieFunctionVoid,handle)
+        end
+        Threads.Scaleforms.Draw = function(scaleformName,...)
+            exports.threads:DrawScaleformMovie(scaleformName,...)
+        end
+        Threads.Scaleforms.DrawDuration = function(scaleformName,duration,...)
+            exports.threads:DrawScaleformMovieDuration(scaleformName,duration,...)
+        end
+        Threads.Scaleforms.End = function(scaleformName)
+            exports.threads:EndScaleformMovie(scaleformName)
+        end; Threads.Scaleforms.Kill = Threads.Scaleforms.End
         
-            CreateThread(function()
-                if Threads.Scaleforms.GetTotal and exports.threads:GetTotal() > 0 then 
-                    while true do 
-                        local num = exports.threads:GetTotal()
-                        if num > 0 then 
-                            print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+        Threads.Scaleforms.RequestCallback = function(scaleformName,SfunctionName,...) 
+            exports.threads:RequestScaleformCallbackAny(scaleformName,SfunctionName,...) 
+        end
+        
+        Threads.Scaleforms.DrawPosition = function(scaleformName,...) 
+            exports.threads:DrawScaleformMoviePosition(scaleformName,...) 
+        end
+        Threads.Scaleforms.DrawPosition2 = function(scaleformName,...) 
+            exports.threads:DrawScaleformMoviePosition2(scaleformName,...) 
+        end
+        Threads.Scaleforms.DrawPositionDuration = function(scaleformName,duration,...)
+            exports.threads:DrawScaleformMoviePositionDuration(scaleformName,duration,...)
+        end
+        Threads.Scaleforms.DrawPosition2Duration = function(scaleformName,duration,...)
+            exports.threads:DrawScaleformMoviePosition2Duration(scaleformName,duration,...)
+        end
+
+        Threads.Scaleforms.Draw3DSpeical = function(scaleformName,ped,...) 
+            exports.threads:DrawScaleformMovie3DSpeical(scaleformName,ped,...) 
+        end
+
+        Threads.Scaleforms.GetTotal = function()
+            return exports.threads:GetTotal()
+        end
+        
+        if GetCurrentResourceName() == this.scriptName and not IsDuplicityVersion() then 
+            
+                CreateThread(function()
+                    if Threads.Scaleforms.GetTotal and exports.threads:GetTotal() > 0 then 
+                        while true do 
+                            local num = exports.threads:GetTotal()
+                            if num > 0 then 
+                                print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                            end 
+                            Wait(60000)
                         end 
-                        Wait(60000)
+                        return 
                     end 
-                    return 
-                end 
-                return
-            end)
+                    return
+                end)
+            
+        end 
+        Threads.Draws = {}
+        Threads.Draws.PositionText = function(text,coords,duration,cb)
+            exports.threads:positiontext(text,coords,duration,cb)
+        end 
+    elseif isServer() then 
         
-    end 
-    Threads.Draws = {}
-    Threads.Draws.PositionText = function(text,coords,duration,cb)
-        exports.threads:positiontext(text,coords,duration,cb)
     end 
 else 
     print("Threads:Due to local sciprts,modules ")
