@@ -780,9 +780,11 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
         local inputfunction = function(sfunc) PushScaleformMovieFunction(handle,sfunc) end
         if GetCurrentResourceName() ~= this.scriptName then 
             if not ThisScriptsScaleforms[scaleformName] then 
-            ThisScriptsScaleforms[scaleformName] = true 
-            local num = Threads.Scaleforms.GetTotal()
-            print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                ThisScriptsScaleforms[scaleformName] = true 
+                local num = Threads.Scaleforms.GetTotal()
+                if num > 0 then 
+                    print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                end 
             end 
         end 
         cb(inputfunction,SendScaleformValues,PopScaleformMovieFunctionVoid,handle)
@@ -823,13 +825,21 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
     end
     
     if GetCurrentResourceName() == this.scriptName then 
-        CreateThread(function()
-            while true do 
-                local num = Threads.Scaleforms.GetTotal()
-                print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d",num) .. "ms")
-                Wait(60000)
-            end 
-        end)
+        
+            CreateThread(function()
+                if Threads.Scaleforms.GetTotal and exports.threads:GetTotal() > 0 then 
+                    while true do 
+                        local num = exports.threads:GetTotal()
+                        if num > 0 then 
+                            print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d",num) .. "ms")
+                        end 
+                        Wait(60000)
+                    end 
+                    return 
+                end 
+                return
+            end)
+        
     end 
     Threads.Draws = {}
     Threads.Draws.PositionText = function(text,coords,duration,cb)
