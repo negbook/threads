@@ -19,7 +19,8 @@ Thread.CreateLoop(actionname,millisecondID,...   make a CreateThread(function wh
 Will Group all the same duration actions into one CreateThread
 You can delete any action of loop with ```Threads.KillActionOfLoop(actionname)```  
 Auto delete and break the while loop when all those actions in that while loop have been killed.  
-  
+
+
 You can create a custom Loop which can be set or get the delay of next loop with the cb.setter or cb.getter  
 ```Threads.CreateLoopCustom(actionname,0,function(delay) delay.setter(3000) end)```  
 But the Threads.CreateLoopCustom does not group the loops and always create a new CreateThread while loop  

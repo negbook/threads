@@ -713,7 +713,7 @@ local TweenCFX = {}
            return this
        end })
        if not TweenCFX.tweenDepth or TweenCFX.tweenDepth > 65530 then TweenCFX.tweenDepth = 1 end 
-       TweenCFX.tweenDepth = TweenCFX.tweenDepth + 1
+       TweenCFX.tweenDepth =  TweenCFX.tweenDepth + 1
        this.object.TweenRef = TweenCFX.TweenRef(this.Thread,this.props,this.vars);
        this.Thread.threadid = Threads.CreateLoopOnce("TSLContainerThread"..TweenCFX.tweenDepth,0,function()
             if this.Thread.onUpdate then 
@@ -820,7 +820,7 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
     
     Threads.NativeMessages = {}
     Threads.NativeMessages.hudmessage = function(...) return exports.threads:hudmessage(...) end 
-    Threads.NativeMessages.hudmessage2 = function(...) return exports.threads:hudmessage2(...) end 
+    Threads.NativeMessages.coordsmessage = function(...) return exports.threads:coordsmessage(...) end 
     Threads.NativeMessages.entitymessage = function(...) return exports.threads:entitymessage(...) end 
     Threads.NativeMessages.entitymessageend = function(...) return exports.threads:entitymessageend(...) end 
     Threads.NativeMessages.entityquickmessage = function(...) return exports.threads:entityquickmessage(...) end 
