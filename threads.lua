@@ -818,14 +818,7 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
         return exports.threads:GetTotal()
     end
     
-    Threads.NativeMessages = {}
-    Threads.NativeMessages.hudmessage = function(...) return exports.threads:hudmessage(...) end 
-    Threads.NativeMessages.hudmessage2 = function(...) return exports.threads:hudmessage2(...) end 
-    Threads.NativeMessages.coordsmessage = function(...) return exports.threads:coordsmessage(...) end 
-    Threads.NativeMessages.coordsmessage2 = function(...) return exports.threads:coordsmessage2(...) end 
-    Threads.NativeMessages.entitymessage = function(...) return exports.threads:entitymessage(...) end 
-    Threads.NativeMessages.entitymessageend = function(...) return exports.threads:entitymessageend(...) end 
-    Threads.NativeMessages.entityquickmessage = function(...) return exports.threads:entityquickmessage(...) end 
+
 else 
     print("Threads:Due to local sciprts,modules ")
     print("Arrial/Scaleforms is disabled.")
