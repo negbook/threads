@@ -41,14 +41,14 @@ hudmessage = function(text,xper,yper,scale,durationIn,durationHold,durationOut,c
         hudmessage_handles[hudmessage_handle] = true 
         
         Threads.TweenCFX.to(object,durationIn,{_alpha=255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,hudmessage_handle,cb)
-            --Threads.TweenCFX.delayCall(object,durationHold,{_alpha=0,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,hudmessage_handle,cb)
+            Threads.TweenCFX.delayCall(object,durationHold,{_alpha=0,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,hudmessage_handle,cb)
                 Threads.TweenCFX.to(object,durationOut,{_alpha=0,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,hudmessage_handle,cb)
                     hudmessage_handles[hudmessage_handle] = nil
                     if cb then 
                         cb(object)
                     end
                 end ,onCompleteArgs={object,hudmessage_handle,cb}})
-            --end ,onCompleteArgs={object,hudmessage_handle,cb}})
+            end ,onCompleteArgs={object,hudmessage_handle,cb}})
             
         end ,onCompleteArgs={object,hudmessage_handle,cb}})
     
@@ -60,7 +60,7 @@ hudmessage = function(text,xper,yper,scale,durationIn,durationHold,durationOut,c
                 DrawNextOrder(hudmessage_handle)
                 DrawText2D(object._text,object._scale,object._x,object._y,math.floor(object._alpha))
             else 
-                Break("hudmessage"..hudmessage_handle)
+                Break()
             end 
         end )
 end
@@ -106,7 +106,7 @@ hudmessage2 = function(text,coords,duration,cb)
                 DrawNextOrder(hudmessage2_handle)
                 DrawText2D(object._text,object._scale,object._x,object._y,math.floor(object._alpha))
             else 
-                Break("hudmessage2"..hudmessage2_handle)
+                Break()
             end 
             
             
@@ -171,7 +171,7 @@ entitymessage = function(entity,text,duration,cb)
                     DrawNextOrder(entitymessage_handle)
                     DrawText2D(object._text,object._scale,object._x,object._y,math.floor(object._alpha))
                 else 
-                    Break("entitymessage"..entitymessage_handle)
+                    Break()
                 end 
                
                 
@@ -241,7 +241,7 @@ entityquickmessage = function(entity,text,duration,cb)
                    
                     DrawText2D(object._text,object._scale,object._x,object._y,math.floor(object._alpha))
                 else 
-                    Break("entityquickmessage"..entityquickmessage_handle)
+                    Break()
                 end 
                
             end)
