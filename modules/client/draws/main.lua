@@ -123,7 +123,7 @@ local positiontext = function(text,coords,duration,pedrelative)
                                 end 
                             elseif positiontext_handles[positiontext_handle]=="shoudkill" then  
                                 Break()
-                                print('break')
+                                
                             end 
                     end )
             elseif result.action == 'exit' then 

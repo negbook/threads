@@ -756,8 +756,7 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
 
     Threads.Scaleforms = {}
     if GetCurrentResourceName() ~= this.scriptName then 
-    
-    ThisScriptsScaleforms = {}
+        ThisScriptsScaleforms = {}
     end 
 
     AddEventHandler('onResourceStop', function(resourceName)
@@ -776,11 +775,16 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
     end)
 
     Threads.Scaleforms.Call = function(scaleformName,cb) 
-        if GetCurrentResourceName() ~= this.scriptName then 
-            ThisScriptsScaleforms[scaleformName] = true 
-        end 
+        
         local handle = exports.threads:CallScaleformMovie(scaleformName) 
         local inputfunction = function(sfunc) PushScaleformMovieFunction(handle,sfunc) end
+        if GetCurrentResourceName() ~= this.scriptName then 
+            if not ThisScriptsScaleforms[scaleformName] then 
+            ThisScriptsScaleforms[scaleformName] = true 
+            local num = Threads.Scaleforms.GetTotal()
+            print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+            end 
+        end 
         cb(inputfunction,SendScaleformValues,PopScaleformMovieFunctionVoid,handle)
     end
     Threads.Scaleforms.Draw = function(scaleformName,...)
@@ -818,9 +822,17 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
         return exports.threads:GetTotal()
     end
     
+    if GetCurrentResourceName() == this.scriptName then 
+        CreateThread(function()
+            while true do 
+                local num = Threads.Scaleforms.GetTotal()
+                print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d",num) .. "ms")
+                Wait(60000)
+            end 
+        end)
+    end 
     Threads.Draws = {}
     Threads.Draws.PositionText = function(text,coords,duration,cb)
-        
         exports.threads:positiontext(text,coords,duration,cb)
     end 
 else 
