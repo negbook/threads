@@ -6,7 +6,9 @@ description 'Threads'
 client_scripts 
 {
     'threads.lua',
-    'modules/client/**/*.lua'
+    'modules/client/arrival/*.lua',
+    'modules/client/scaleforms/*.lua',
+    'modules/client/draws/*.lua'
     
 }
 

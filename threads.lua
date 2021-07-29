@@ -818,10 +818,13 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
         return exports.threads:GetTotal()
     end
     
-
+    Threads.Draws = {}
+    Threads.Draws.PositionText(text,coords,duration,cb)
+        return exports.threads:positiontext(text,coords,duration,cb)
+    end 
 else 
     print("Threads:Due to local sciprts,modules ")
-    print("Arrial/Scaleforms is disabled.")
+    print("Arrial/Scaleforms/Draws is disabled.")
 end 
 
 
