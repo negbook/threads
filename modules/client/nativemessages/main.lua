@@ -8,9 +8,9 @@ DrawText2D = function(text,scale,x,y,alpha)
 	SetTextDropShadow()
 	SetTextOutline()
 	SetTextCentre(true)
-    AddTextEntry(text,text)
-	BeginTextCommandDisplayText(text)
-	--AddTextComponentSubstringPlayerName(text)
+    
+	BeginTextCommandDisplayText("STRING")
+	AddTextComponentSubstringPlayerName(text)
 	EndTextCommandDisplayText(x, y, 0)
 	--ClearDrawOrigin()
     end 
