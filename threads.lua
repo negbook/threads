@@ -2,7 +2,7 @@ Threads = {}
 debuglog = false
 busyspin = true
 
-Threads_Custom_Handle = 0
+Threads_Custom_Handle = 1
 Threads_Custom_Handles = {}
 Threads_Custom_Alive = {}
 Threads_Custom_Timers = {}
@@ -52,7 +52,8 @@ Threads.loop2_custom = function(_name,_timer,_func,_varname)
                         if Threads_Custom_Alive[v] and Threads_Custom_Functions[v] and Threads_Custom_Timers[v] == timer then 
                             local predelaySetter = {setter=setmetatable({},{__call = function(t,data) Threads.SetLoopCustom(_varname,data) end}),getter=function(t,data) return Threads.GetLoopCustom(_varname) end}
                             local delaySetter = predelaySetter
-                            Threads_Custom_Functions[v](_varname and delaySetter,v,#actiontable or v,#actiontable)
+                            local preBreaker = function(t,data) Threads.BreakCustom(v) end
+                            Threads_Custom_Functions[v](_varname and delaySetter,preBreaker,v,#actiontable or preBreaker,v,#actiontable)
                         else 
                             if actiontable and actiontable[i] then 
                                 table.remove(actiontable ,i) 
@@ -109,7 +110,7 @@ Threads.CreateLoopCustom = function(...) --actionname,defaulttimer(and ID of tim
         print('threads:CreateLoopCustom:Varname:'..varname,"actionname: ".. name) 
     end
     Threads.loop2_custom(name,defaulttimer,func,varname)
-    if Threads_Custom_Handle >= 65530 then Threads_Custom_Handle = 0 end 
+    if Threads_Custom_Handle >= 65530 then Threads_Custom_Handle = 1 end 
     Threads_Custom_Handle = Threads_Custom_Handle + 1
     Threads_Custom_Handles[Threads_Custom_Handle] = name
     return Threads_Custom_Handle
@@ -151,7 +152,7 @@ Threads.CreateLoopOnceCustom = function(...)
         Threads.loop2_custom(name,defaulttimer,func,varname)
         Threads_Custom_Once[name] = true 
     end 
-    if Threads_Custom_Handle >= 65530 then Threads_Custom_Handle = 0 end 
+    if Threads_Custom_Handle >= 65530 then Threads_Custom_Handle = 1 end 
     Threads_Custom_Handle = Threads_Custom_Handle + 1
     Threads_Custom_Handles[Threads_Custom_Handle] = name
     return Threads_Custom_Handle
@@ -282,7 +283,7 @@ Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
 end
 --stable:
 local function Threads_IsActionTableCreated(timer) return Threads_ActionTables[timer]  end 
-Threads_Handle = 0
+Threads_Handle = 1
 Threads_Handles = {}
 Threads_Alive = {}
 Threads_Timers = {}
@@ -330,8 +331,9 @@ Threads.loop2 = function(_name,_timer,_func)
                     local function this()
                         local v = actiontable[i]
                         if Threads_Alive[v] and Threads_Functions[v] and Threads_Timers[v] == timer then 
-                            
-                            Threads_Functions[v](v,#actiontable)
+                            local preBreaker = function(t,data) Threads.Break(v) end
+                           
+                            Threads_Functions[v](preBreaker,v,#actiontable)
                         else 
                             
                             if actiontable and actiontable[i] then 
@@ -371,7 +373,7 @@ Threads.CreateLoop = function(...)
     end 
     if debuglog then print('threads:CreateLoop:CreateThread:'..timer, name) end
     Threads.loop2(name,timer,func)
-    if Threads_Handle >= 65530 then Threads_Handle = 0 end 
+    if Threads_Handle >= 65530 then Threads_Handle = 1 end 
     Threads_Handle = Threads_Handle + 1
     Threads_Handles[Threads_Handle] = name
     return Threads_Handle
@@ -398,11 +400,12 @@ Threads.CreateLoopOnce = function(...)
         Threads.loop2(name,timer,func)
         Threads_Once[name] = true 
     end 
-    if Threads_Handle >= 65530 then Threads_Handle = 0 end 
+    if Threads_Handle >= 65530 then Threads_Handle = 1 end 
     Threads_Handle = Threads_Handle + 1
     Threads_Handles[Threads_Handle] = name
     return Threads_Handle
 end
+
 Threads.IsActionOfLoopAlive = function(name)
     return Threads_Alive[name] and true or false
 end 
@@ -443,27 +446,32 @@ Threads.KillHandleOfLoop = function(handle)
         Threads.KillActionOfLoop(Threads_Handles[handle])
     end 
 end 
-
+Threads.Break = function(name)
+    if Threads.IsActionOfLoopAlive(name) then Threads.KillActionOfLoop(name) end 
+end 
+Threads.BreakCustom = function(name)
+    if Threads.IsActionOfLoopAliveCustom(name) then Threads.KillActionOfLoopCustom(name) end 
+end 
 --Tween:
 local TweenCFX = {}
 
-    TweenCFX.tweenDepth = 1;
-    TweenCFX.Back = {}
-        TweenCFX.Back.easeIn = function (t, b, c, d, s)
+    
+    local Back = {}
+        Back.easeIn = function (t, b, c, d, s)
            if not s then 
               s = 1.70158;
            end
            t = t / d
            return c * (t) * t * ((s + 1) * t - s) + b;
         end 
-        TweenCFX.Back.easeOut = function (t, b, c, d, s)
+        Back.easeOut = function (t, b, c, d, s)
            if not s then 
               s = 1.70158;
            end 
            t = t / d - 1
            return c * ((t) * t * ((s + 1) * t + s) + 1) + b;
         end
-        TweenCFX.Back.easeInOut = function (t, b, c, d, s)
+        Back.easeInOut = function (t, b, c, d, s)
            if not s then 
               s = 1.70158;
            end 
@@ -476,16 +484,16 @@ local TweenCFX = {}
            s = s * 1.525
            return c * 0.5 * ((t) * t * (((s) + 1) * t + s) + 2) + b;
         end
-    TweenCFX.Circ = {}
-        TweenCFX.Circ.easeIn = function (t, b, c, d)
+    local Circ = {}
+        Circ.easeIn = function (t, b, c, d)
            t = t / d
            return (- c) * (math.sqrt(1 - (t) * t) - 1) + b;
         end
-        TweenCFX.Circ.easeOut = function (t, b, c, d)
+        Circ.easeOut = function (t, b, c, d)
            t = t / d - 1
            return c * math.sqrt(1 - (t) * t) + b;
         end
-        TweenCFX.Circ.easeInOut = function (t, b, c, d)
+        Circ.easeInOut = function (t, b, c, d)
            t = t / (d / 2)
            if((t) < 1) then 
               return (- c) / 2 * (math.sqrt(1 - t * t) - 1) + b;
@@ -493,16 +501,16 @@ local TweenCFX = {}
            t = t - 2
            return c / 2 * (math.sqrt(1 - (t) * t) + 1) + b;
         end
-    TweenCFX.Cubic = {}
-        TweenCFX.Cubic.easeIn = function (t, b, c, d)
+    local Cubic = {}
+        Cubic.easeIn = function (t, b, c, d)
            t = t / d
            return c * (t) * t * t + b;
         end 
-        TweenCFX.Cubic.easeOut = function (t, b, c, d)
+        Cubic.easeOut = function (t, b, c, d)
            t = t / d - 1
            return c * ((t) * t * t + 1) + b;
         end
-        TweenCFX.Cubic.easeInOut = function (t, b, c, d)
+        Cubic.easeInOut = function (t, b, c, d)
            t = t / (d / 2)
            if((t) < 1) then
               return c / 2 * t * t * t + b;
@@ -510,24 +518,24 @@ local TweenCFX = {}
            t = t - 2
            return c / 2 * ((t) * t * t + 2) + b;
         end
-    TweenCFX.Linear = {}
-        TweenCFX.Linear._temp_ = function (t, b, c, d)
+    local Linear = {}
+        Linear._temp_ = function (t, b, c, d)
            return c * t / d + b;
         end 
-        TweenCFX.Linear.easeNone = TweenCFX.Linear._temp_
-        TweenCFX.Linear.easeIn = TweenCFX.Linear._temp_
-        TweenCFX.Linear.easeOut = TweenCFX.Linear._temp_
-        TweenCFX.Linear.easeInOut = TweenCFX.Linear._temp_
-    TweenCFX.Quad = {}
-       TweenCFX.Quad.easeIn = function (t, b, c, d)
+        Linear.easeNone = Linear._temp_
+        Linear.easeIn = Linear._temp_
+        Linear.easeOut = Linear._temp_
+        Linear.easeInOut = Linear._temp_
+    local Quad = {}
+       Quad.easeIn = function (t, b, c, d)
           t = t / d
           return c * (t) * t + b;
        end
-       TweenCFX.Quad.easeOut = function (t, b, c, d)
+       Quad.easeOut = function (t, b, c, d)
           t = t / d
           return (- c) * (t) * (t - 2) + b;
        end
-       TweenCFX.Quad.easeInOut = function (t, b, c, d)
+       Quad.easeInOut = function (t, b, c, d)
           t = t / (d / 2)
           if((t) < 1) then 
              return c / 2 * t * t + b;
@@ -535,16 +543,16 @@ local TweenCFX = {}
           t = t - 1
           return (- c) / 2 * ((t) * (t - 2) - 1) + b;
        end
-    TweenCFX.Quart = {}
-       TweenCFX.Quart.easeIn = function (t, b, c, d)
+    local Quart = {}
+       Quart.easeIn = function (t, b, c, d)
           t = t / d
           return c * (t) * t * t * t + b;
        end
-       TweenCFX.Quart.easeOut = function (t, b, c, d)
+       Quart.easeOut = function (t, b, c, d)
           t = t / d - 1
           return (- c) * ((t) * t * t * t - 1) + b;
        end
-       TweenCFX.Quart.easeInOut = function (t, b, c, d)
+       Quart.easeInOut = function (t, b, c, d)
           t = t / (d / 2)
           if((t) < 1) then 
              return c / 2 * t * t * t * t + b;
@@ -552,56 +560,56 @@ local TweenCFX = {}
           t = t - 2
           return (- c) / 2 * ((t) * t * t * t - 2) + b;
        end
-    TweenCFX.Sine = {}
-       TweenCFX.Sine.easeIn = function (t, b, c, d)
+    local Sine = {}
+       Sine.easeIn = function (t, b, c, d)
           return (- c) * math.cos(t / d * 1.5707963267948966) + c + b;
        end
-       TweenCFX.Sine.easeOut = function (t, b, c, d)
+       Sine.easeOut = function (t, b, c, d)
           return c * math.sin(t / d * 1.5707963267948966) + b;
        end
-       TweenCFX.Sine.easeInOut = function (t, b, c, d)
+       Sine.easeInOut = function (t, b, c, d)
           return (- c) / 2 * (math.cos(3.141592653589793 * t / d) - 1) + b;
        end
     TweenCFX.Ease = {}
-       TweenCFX.Ease.Linear = 0;
-       TweenCFX.Ease.QuadraticIn = 1;
-       TweenCFX.Ease.QuadraticOut = 2;
-       TweenCFX.Ease.QuadraticInout = 3;
-       TweenCFX.Ease.CubicIn = 4;
-       TweenCFX.Ease.CubicOut = 5;
-       TweenCFX.Ease.CubicInout = 6;
-       TweenCFX.Ease.QuarticIn = 7;
-       TweenCFX.Ease.QuarticOut = 8;
-       TweenCFX.Ease.QuarticInout = 9;
-       TweenCFX.Ease.SineIn = 10;
-       TweenCFX.Ease.SineOut = 11;
-       TweenCFX.Ease.SineInout = 12;
-       TweenCFX.Ease.BackIn = 13;
-       TweenCFX.Ease.BackOut = 14;
-       TweenCFX.Ease.BackInout = 15;
-       TweenCFX.Ease.CircularIn = 16;
-       TweenCFX.Ease.CircularOut = 17;
-       TweenCFX.Ease.CircularInout = 18;
+       TweenCFX.Ease.Linear = 1
+       TweenCFX.Ease.QuadraticIn = 2
+       TweenCFX.Ease.QuadraticOut = 3
+       TweenCFX.Ease.QuadraticInout = 4
+       TweenCFX.Ease.CubicIn = 5
+       TweenCFX.Ease.CubicOut = 6
+       TweenCFX.Ease.CubicInout = 7
+       TweenCFX.Ease.QuarticIn = 8
+       TweenCFX.Ease.QuarticOut = 9
+       TweenCFX.Ease.QuarticInout = 10
+       TweenCFX.Ease.SineIn = 11;
+       TweenCFX.Ease.SineOut = 12
+       TweenCFX.Ease.SineInout = 13
+       TweenCFX.Ease.BackIn = 14
+       TweenCFX.Ease.BackOut = 15
+       TweenCFX.Ease.BackInout = 16
+       TweenCFX.Ease.CircularIn = 17
+       TweenCFX.Ease.CircularOut = 18
+       TweenCFX.Ease.CircularInout = 19
        TweenCFX.Ease.EaseTable = {
-           TweenCFX.Linear.easeNone,
-           TweenCFX.Quad.easeIn,
-           TweenCFX.Quad.easeOut,
-           TweenCFX.Quad.easeInOut,
-           TweenCFX.Cubic.easeIn,
-           TweenCFX.Cubic.easeOut,
-           TweenCFX.Cubic.easeInOut,
-           TweenCFX.Quart.easeIn,
-           TweenCFX.Quart.easeOut,
-           TweenCFX.Quart.easeInOut,
-           TweenCFX.Sine.easeIn,
-           TweenCFX.Sine.easeOut,
-           TweenCFX.Sine.easeInOut,
-           TweenCFX.Back.easeIn,
-           TweenCFX.Back.easeOut,
-           TweenCFX.Back.easeInOut,
-           TweenCFX.Circ.easeIn,
-           TweenCFX.Circ.easeOut,
-           TweenCFX.Circ.easeInOut
+           Linear.easeNone,
+           Quad.easeIn,
+           Quad.easeOut,
+           Quad.easeInOut,
+           Cubic.easeIn,
+           Cubic.easeOut,
+           Cubic.easeInOut,
+           Quart.easeIn,
+           Quart.easeOut,
+           Quart.easeInOut,
+           Sine.easeIn,
+           Sine.easeOut,
+           Sine.easeInOut,
+           Back.easeIn,
+           Back.easeOut,
+           Back.easeInOut,
+           Circ.easeIn,
+           Circ.easeOut,
+           Circ.easeInOut
        };
 
     TweenCFX.Tween = setmetatable({
@@ -613,6 +621,7 @@ local TweenCFX = {}
               if timeProgressing > 0 then 
                 if this.props[i] and this.props[i][1] and this.props[i][2] and this.props[i][3] then 
                     this.object[this.props[i][1]] = this.ease(timeProgressing,this.props[i][2],this.props[i][3] - this.props[i][2],1);--t,b,c,d
+                    
                 end 
               end 
            end
@@ -669,7 +678,7 @@ local TweenCFX = {}
        this.vars = _vars;
        this.duration = _duration * 1000;
        this.startTime = GetGameTimer() + (this.vars.delay and this.vars.delay * 1000 or 0);
-       this.ease = TweenCFX.Ease.EaseTable[TweenCFX.Ease.Linear+1];
+       this.ease = TweenCFX.Ease.EaseTable[TweenCFX.Ease.Linear];
        this.props = {};
        if _isATween then 
           for abbr,v in pairs (this.vars) do
@@ -679,7 +688,7 @@ local TweenCFX = {}
           end
           if this.vars.ease then 
              if(type(this.vars.ease) == "number") then 
-                this.ease = Ease.EaseTable[this.vars.ease+1];
+                this.ease = TweenCFX.Ease.EaseTable[this.vars.ease];
              end
           end
        end
@@ -700,17 +709,19 @@ local TweenCFX = {}
            this.Thread = _Thread;
            this.props = _props;
            this.vars = _vars;
+           
            return this
        end })
-       
+       if not TweenCFX.tweenDepth or TweenCFX.tweenDepth > 65530 then TweenCFX.tweenDepth = 1 end 
+       TweenCFX.tweenDepth = TweenCFX.tweenDepth + 1
        this.object.TweenRef = TweenCFX.TweenRef(this.Thread,this.props,this.vars);
        this.Thread.threadid = Threads.CreateLoopOnce("TSLContainerThread"..TweenCFX.tweenDepth,0,function()
             if this.Thread.onUpdate then 
                 this.Thread.onUpdate(this.Thread.tweenUpdateRef )
             end 
        end );
-       if TweenCFX.tweenDepth > 65530 then TweenCFX.tweenDepth = 0 end
-       TweenCFX.tweenDepth = TweenCFX.tweenDepth + 1
+       
+       
        return this
     end })
     
@@ -807,6 +818,12 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
         return exports.threads:GetTotal()
     end
     
+    Threads.NativeMessages = {}
+    Threads.NativeMessages.hudmessage = function(...) return exports.threads:hudmessage(...) end 
+    Threads.NativeMessages.hudmessage2 = function(...) return exports.threads:hudmessage2(...) end 
+    Threads.NativeMessages.entitymessage = function(...) return exports.threads:entitymessage(...) end 
+    Threads.NativeMessages.entitymessageend = function(...) return exports.threads:entitymessageend(...) end 
+    Threads.NativeMessages.entityquickmessage = function(...) return exports.threads:entityquickmessage(...) end 
 else 
     print("Threads:Due to local sciprts,modules ")
     print("Arrial/Scaleforms is disabled.")
