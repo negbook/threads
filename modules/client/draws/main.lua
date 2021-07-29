@@ -73,7 +73,7 @@ local positiontext = function(text,coords,duration,pedrelative)
                             elseif positiontext_handles[positiontext_handle]=="show" then 
                                 local distance = #(GetEntityCoords(PlayerPedId()) - coords)
                                 if distance < 8 then 
-                                    DrawNextOrder(positiontext_handle)
+                                    
                                     local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                                     local bool2 = true 
                                     if pedrelative then bool2 = IsPedHeadingTowardsPosition(PlayerPedId(), coords.x,coords.y,coords.z,90.0) end 
@@ -89,6 +89,7 @@ local positiontext = function(text,coords,duration,pedrelative)
                                                 end,onCompleteArgs={object,positiontext_handle,pedrelative}})
                                             end 
                                             object._x,object._y = xper,yper
+                                            DrawNextOrder(positiontext_handle)
                                             DrawText3D(coords,object._text,object._scale,object._x,object._y,math.floor(object._alpha))
                                         else 
                                             Threads.TweenCFX.removeTween(object)
