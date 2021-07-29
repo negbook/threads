@@ -1,12 +1,12 @@
 Threads = {}
+Threads_Modules = {}
 debuglog = false
 busyspin = true
-Threads_Modules = {}
+
 Threads_Modules.Tween = true 
 Threads_Modules.Arrival = true 
 Threads_Modules.Scaleforms = true 
 Threads_Modules.Draws = true 
-
 
 Threads_Custom_Handle = 1
 Threads_Custom_Handles = {}
