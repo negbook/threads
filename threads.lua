@@ -819,8 +819,9 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
     end
     
     Threads.Draws = {}
-    Threads.Draws.PositionText(text,coords,duration,cb)
-        return exports.threads:positiontext(text,coords,duration,cb)
+    Threads.Draws.PositionText = function(text,coords,duration,cb)
+        
+        exports.threads:positiontext(text,coords,duration,cb)
     end 
 else 
     print("Threads:Due to local sciprts,modules ")

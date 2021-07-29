@@ -38,12 +38,9 @@ end
 local DrawNextOrder = function(handle)
     return SetScriptGfxDrawOrder(handle%128)
 end 
-
-
 local positiontext_handle = 1
 local positiontext_handles = {}
-local positiontext = function(text,coords,duration,cb)
-   
+local positiontext = function(text,coords,duration,pedrelative)
     local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
     if bool then 
         local object = {}
@@ -62,71 +59,79 @@ local positiontext = function(text,coords,duration,cb)
         durationOut = durationOut / 1000
         if positiontext_handle > 65530 then positiontext_handle = 1 end 
         positiontext_handle = positiontext_handle + 1
-        
-        Threads.AddPosition("positiontext"..positiontext_handle,coords,20.0,function(result)
-            
+        Threads.AddPosition("positiontext"..positiontext_handle,coords,10.0,function(result)
             if result.action == 'enter' then 
-                
-                positiontext_handles[positiontext_handle] = "unshow"
-                TweenCFX.Tween.to(object,durationIn,{_alpha=255,ease=TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positiontext_handle,cb)
-                    positiontext_handles[positiontext_handle] = "show" 
-                end,onCompleteArgs={object,coordsmessage_handle,cb}})
-                Threads.CreateLoopOnce("positiontext"..positiontext_handle,0,function(Break)
-                    if positiontext_handles[positiontext_handle]=="unshow" then 
-                        DrawNextOrder(positiontext_handle)
-                        local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
-                        if bool then 
-                            object._x,object._y = xper,yper
-                            DrawText3D(coords,object._text,object._scale,object._x,object._y,math.floor(object._alpha))
-                        end
-                    elseif positiontext_handles[positiontext_handle]=="show" then 
-                        local distance = #(GetEntityCoords(PlayerPedId()) - coords)
-                        
-                        if distance < 8 then 
-                            DrawNextOrder(positiontext_handle)
-                            local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
-                            if bool then 
-                                object._x,object._y = xper,yper
-                                DrawText3D(coords,object._text,object._scale,object._x,object._y,math.floor(object._alpha))
-                            else 
-                                TweenCFX.Tween.removeTween(object)
-                                object._alpha = 0
-                                positiontext_handles[positiontext_handle] = "hide" 
+                positiontext_handles[positiontext_handle] = "hide" 
+                    Threads.CreateLoopOnce("positiontext"..positiontext_handle,0,function(Break)
+                            if positiontext_handles[positiontext_handle]=="unshow" then 
+                                DrawNextOrder(positiontext_handle)
+                                local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
+                                if bool then 
+                                    object._x,object._y = xper,yper
+                                    DrawText3D(coords,object._text,object._scale,object._x,object._y,math.floor(object._alpha))
+                                end
+                            elseif positiontext_handles[positiontext_handle]=="show" then 
+                                local distance = #(GetEntityCoords(PlayerPedId()) - coords)
+                                if distance < 8 then 
+                                    DrawNextOrder(positiontext_handle)
+                                    local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
+                                    local bool2 = true 
+                                    if pedrelative then bool2 = IsPedHeadingTowardsPosition(PlayerPedId(), coords.x,coords.y,coords.z,90.0) end 
+                                    if not bool2 then 
+                                            positiontext_handles[positiontext_handle] = "unshow" 
+                                        Threads.TweenCFX.to(object,durationIn,{_alpha=0,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positiontext_handle,pedrelative)
+                                            positiontext_handles[positiontext_handle] = "hide" 
+                                        end,onCompleteArgs={object,positiontext_handle,pedrelative}})
+                                    else 
+                                        if bool then 
+                                            if math.floor(object._alpha) == 0 then 
+                                                Threads.TweenCFX.to(object,durationIn,{_alpha=255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positiontext_handle,pedrelative)
+                                                end,onCompleteArgs={object,positiontext_handle,pedrelative}})
+                                            end 
+                                            object._x,object._y = xper,yper
+                                            DrawText3D(coords,object._text,object._scale,object._x,object._y,math.floor(object._alpha))
+                                        else 
+                                            Threads.TweenCFX.removeTween(object)
+                                            object._alpha = 0
+                                            positiontext_handles[positiontext_handle] = "hide" 
+                                        end 
+                                    end 
+                                else 
+                                    positiontext_handles[positiontext_handle] = "unshow" 
+                                    Threads.TweenCFX.to(object,durationIn,{_alpha=0,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positiontext_handle,pedrelative)
+                                        positiontext_handles[positiontext_handle] = "hide" 
+                                    end,onCompleteArgs={object,positiontext_handle,pedrelative}})
+                                end 
+                            elseif positiontext_handles[positiontext_handle]=="hide" then 
+                                local distance = #(GetEntityCoords(PlayerPedId()) - coords)
+                                if distance < 8 then 
+                                    local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
+                                    local bool2 = true
+                                    if pedrelative then bool2 = IsPedHeadingTowardsPosition(PlayerPedId(), coords.x,coords.y,coords.z,90.0) end 
+                                    if bool and bool2 then 
+                                        positiontext_handles[positiontext_handle] = "unshow" 
+                                        if math.floor(object._alpha) == 0 then 
+                                            Threads.TweenCFX.to(object,durationIn,{_alpha=255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positiontext_handle,pedrelative)
+                                                positiontext_handles[positiontext_handle] = "show" 
+                                            end,onCompleteArgs={object,positiontext_handle,pedrelative}})
+                                        end 
+                                    else 
+                                        Threads.TweenCFX.removeTween(object)
+                                        object._alpha = 0
+                                        positiontext_handles[positiontext_handle] = "hide" 
+                                    end  
+                                end 
+                            elseif positiontext_handles[positiontext_handle]=="shoudkill" then  
+                                Break()
+                                print('break')
                             end 
-                        else 
-                            positiontext_handles[positiontext_handle] = "unshow" 
-                            TweenCFX.Tween.to(object,durationIn,{_alpha=0,ease=TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positiontext_handle,cb)
-                                positiontext_handles[positiontext_handle] = "hide" 
-                            end,onCompleteArgs={object,coordsmessage_handle,cb}})
-                        end 
-                    elseif positiontext_handles[positiontext_handle]=="hide" then 
-                        local distance = #(GetEntityCoords(PlayerPedId()) - coords)
-                        if distance < 8 then 
-                            local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
-                            if bool then 
-                                positiontext_handles[positiontext_handle] = "unshow" 
-                                TweenCFX.Tween.to(object,durationIn,{_alpha=255,ease=TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positiontext_handle,cb)
-                                    positiontext_handles[positiontext_handle] = "show" 
-                                end,onCompleteArgs={object,coordsmessage_handle,cb}})
-                            else 
-                                TweenCFX.Tween.removeTween(object)
-                                object._alpha = 0
-                                positiontext_handles[positiontext_handle] = "hide" 
-                            end  
-                        end 
-                    elseif positiontext_handles[positiontext_handle]=="shoudkill" then  
-                        Break()
-                    end 
-                end )
+                    end )
             elseif result.action == 'exit' then 
                 positiontext_handles[positiontext_handle] = "shoudkill"
             end 
         end)
     end 
 end
-
-exports('positiontext', function (...)
-    return positiontext(...)
+exports('positiontext', function (text,coords,duration,pedrelative)
+    return positiontext(text,coords,duration,pedrelative)
 end )
-
-
