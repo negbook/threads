@@ -799,7 +799,7 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
                         ThisScriptsScaleforms[scaleformName] = true 
                         local num = Threads.Scaleforms.GetTotal()
                         if num > 0 then 
-                            print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                            print("Threads:Drawing "..num.." Scaleforms are take about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
                         end 
                     end 
                 end 
@@ -847,7 +847,7 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
                             while true do 
                                 local num = exports.threads:GetTotal()
                                 if num > 0 then 
-                                    print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                                    print("Threads:Drawing "..num.." Scaleforms are take about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
                                 end 
                                 Wait(60000)
                             end 
@@ -869,7 +869,7 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
     end 
 else 
     print("Threads:Due to local sciprts,modules ")
-    print("Arrial/Scaleforms/Draws is being localed.")
+    print("Arrial/Scaleforms/Draws is being localed with same usage.")
     if Threads_Modules.Scaleforms then 
         Threads.Scaleforms_Local = {}
         Threads.Scaleforms_Local.temp_tasks = {}
@@ -877,14 +877,6 @@ else
         Threads.Scaleforms_Local.Handles = {}
         Threads.Scaleforms_Local.Kill = {}
         Threads.Scaleforms_Local.ReleaseTimer = {}
-
-        --[=[
-        --  TriggerEvent('CallScaleformMovie','TALK_MESSAGE',function(run,send,stop)  -- or function(run,send,stop,handle)
-                    run('SayToAll')
-                        send(1,2,3,4,5)
-                    stop()
-            end )
-        --]=]
         local loadScaleform = function(scaleformName)
             local loaded = false 
             if HasScaleformMovieLoaded(Threads.Scaleforms_Local.Handles[scaleformName]) then return Threads.Scaleforms_Local.Handles[scaleformName] end 
@@ -978,17 +970,6 @@ else
         end
         Threads.Scaleforms_Local.DrawScaleformMoviePosition = function (scaleformName,...)
             if not Threads.Scaleforms_Local.Handles[scaleformName] or not HasScaleformMovieLoaded(Threads.Scaleforms_Local.Handles[scaleformName]) then 
-                --[=[
-                Threads.Scaleforms_Local.Handles[scaleformName] = RequestScaleformMovie(scaleformName)
-                while not HasScaleformMovieLoaded(Threads.Scaleforms_Local.Handles[scaleformName]) do 
-                    Wait(0)
-                end 
-                local count = 0
-                for i,v in pairs(Threads.Scaleforms_Local.Handles) do 
-                    count = count + 1
-                end 
-                Scaleforms.counts = count
-                --]=]
                 loadScaleform(scaleformName)
             end 
                 local ops = {...}
@@ -1025,17 +1006,6 @@ else
         end
         Threads.Scaleforms_Local.DrawScaleformMoviePosition2 = function (scaleformName,...)
             if not Threads.Scaleforms_Local.Handles[scaleformName] or not HasScaleformMovieLoaded(Threads.Scaleforms_Local.Handles[scaleformName]) then 
-                --[=[
-                Threads.Scaleforms_Local.Handles[scaleformName] = RequestScaleformMovie(scaleformName)
-                while not HasScaleformMovieLoaded(Threads.Scaleforms_Local.Handles[scaleformName]) do 
-                    Wait(0)
-                end 
-                local count = 0
-                for i,v in pairs(Threads.Scaleforms_Local.Handles) do 
-                    count = count + 1
-                end 
-                Scaleforms.counts = count
-                --]=]
                 loadScaleform(scaleformName)
             end 
                 local ops = {...}
