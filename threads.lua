@@ -831,7 +831,7 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
                     while true do 
                         local num = exports.threads:GetTotal()
                         if num > 0 then 
-                            print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d",num) .. "ms")
+                            print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
                         end 
                         Wait(60000)
                     end 
