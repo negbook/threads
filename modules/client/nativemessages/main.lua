@@ -22,7 +22,7 @@ end
 local hudmessage_handle = 1
 local hudmessage_handles = {}
 
-hudmessage = function(text,xper,yper,scale,durationIn,durationHold,durationOut,cb)
+local hudmessage = function(text,xper,yper,scale,durationIn,durationHold,durationOut,cb)
     local object = {}
         object._text = text
         object._x = xper
@@ -67,7 +67,7 @@ end
 
 local hudmessage2_handle = 1
 local hudmessage2_handles = {}
-hudmessage2 = function(text,coords,duration,cb)
+local hudmessage2 = function(text,coords,duration,cb)
    
     local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
     if bool then 
@@ -117,7 +117,7 @@ end
 local entitymessage_handle = 1
 local entitymessage_handles = {}
 
-entitymessage = function(entity,text,duration,cb)
+local entitymessage = function(entity,text,duration,cb)
         
         local coords = GetEntityCoords(entity)
         local model = GetEntityModel(entity)
@@ -180,7 +180,7 @@ entitymessage = function(entity,text,duration,cb)
        
 end
 
-entitymessageend = function(entity,cb)
+local entitymessageend = function(entity,cb)
     for i,v in pairs(entitymessage_handles) do 
         if v == entity then 
             entitymessage_handles[entitymessage_handle] = nil
@@ -194,7 +194,7 @@ end
 local entityquickmessage_handle = 1
 local entityquickmessage_handles = {}
 
-entityquickmessage = function(entity,text,duration,cb)
+local entityquickmessage = function(entity,text,duration,cb)
         
         local coords = GetEntityCoords(entity)
         local model = GetEntityModel(entity)
