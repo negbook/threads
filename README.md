@@ -13,6 +13,12 @@ client_script '@threads/threads.lua'
 It is recommended starting the threads script in resource.cfg
 So that you can using Scaleforms and Arrival modules.
 
+# About perfromances
+Putting draw natives in a loop in local script will cast 0.01ms per draw at lease.
+It will be casted more ms also below:
+When you create more than one while-true-do loops.
+When you call a remote draw-natives/functions in a local loop. 
+
 # DESCRIPTION
 
 Thread.CreateLoop(actionname,millisecondID,...   make a CreateThread(function while Wait(x) blablabla end end) loop  

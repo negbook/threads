@@ -371,7 +371,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                         else 
                             if bool then 
                                 if math.floor(object._alpha) == 0 then 
-                                    Threads.TweenCFX.to(object,durationIn,{_alpha=vars._toalpha or 255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positionmarker_handle,pedrelative)
+                                    Threads.TweenCFX.to(object,durationIn,{_alpha=vars and vars._toalpha or 255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positionmarker_handle,pedrelative)
                                     end,onCompleteArgs={object,positionmarker_handle,pedrelative}})
                                 end 
                                 DrawNextOrder(positionmarker_handle)
@@ -397,7 +397,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                         if bool and bool2 then 
                             positionmarker_handles[positionmarker_handle] = "unshow" 
                             if math.floor(object._alpha) == 0 then 
-                                Threads.TweenCFX.to(object,durationIn,{_alpha=vars._toalpha or 255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positionmarker_handle,pedrelative)
+                                Threads.TweenCFX.to(object,durationIn,{_alpha=vars and vars._toalpha or 255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positionmarker_handle,pedrelative)
                                     positionmarker_handles[positionmarker_handle] = "show" 
                                 end,onCompleteArgs={object,positionmarker_handle,pedrelative}})
                             end 
