@@ -332,8 +332,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                     if bool then 
                         DrawMarkerStyledAlpha(object)
                     end
-                end 
-                if positionmarker_handles[positionmarker_handle]=="show" then 
+                elseif positionmarker_handles[positionmarker_handle]=="show" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
                     if distance < 20 then 
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
@@ -364,8 +363,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                             positionmarker_handles[positionmarker_handle] = "hide" 
                         end,onCompleteArgs={object,positionmarker_handle,pedrelative}})
                     end 
-                end 
-                if positionmarker_handles[positionmarker_handle]=="hide" then 
+                elseif positionmarker_handles[positionmarker_handle]=="hide" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
                     if distance < 20 then 
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
@@ -384,8 +382,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                             positionmarker_handles[positionmarker_handle] = "hide" 
                         end  
                     end
-                end 
-                if positionmarker_handles[positionmarker_handle]=="shoudkill" then  
+                elseif positionmarker_handles[positionmarker_handle]=="shoudkill" then  
                     Break()
                 end 
             end )

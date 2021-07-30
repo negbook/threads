@@ -3,16 +3,12 @@ setmetatable(Arrival, { __index = Threads })
 Arrival.zonedata_full = {}
 Arrival.positiondata_full = {}
 Arrival.currentzonedata = {}
-
-
 Arrival.ped = nil
 Arrival.pedcoords = vector3(0.0,0.0,0.0)
-Arrival.pedzone = ''
+Arrival.pedzone = nil
 Arrival.debuglog = true
 Arrival_Index = 1
-
 Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
-    
     local fntotable = function(hash) 
         local fns = Arrival.positiondata_full[hash]
         return setmetatable({},{__index=function(t,k) return 'isme' end ,__call=function(t,...) 
@@ -26,7 +22,6 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         --local result = {data=datas[sdata.index],data_arrival=sdata,killer=setmetatable({},{__call = function(t,data) if Threads.IsActionOfLoopAlive(name) then Threads.KillActionOfLoop(name) end  end}),spamer={},action=action}
         --result.spamkiller = result.killer
         local result = {actionname=actionname,data=datas[sdata.sindex],data_arrival=sdata,action=action}
-        
         return _cb(result) 
     end 
     local range,cb = 1.0,cooked_cb
@@ -36,10 +31,8 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         cb = rangeorcb 
     end 
     local data = Arrival.ConvertData(datas)  -- to .x .y .z .index 
-    
     local zonelist,zonedata = Arrival.CollectZoneData(data,range)
     for i,v in pairs (zonedata) do 
-        
         local zone = v.zone
         local cancreate = false 
         if not Arrival.positiondata_full[tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range)] then 
@@ -49,108 +42,52 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         table.insert(Arrival.positiondata_full[tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range)],cb)
         v.arrival = fntotable(tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range))
         v.range = range
-
-        v.enter = false 
-        v.exit = true 
         if not Arrival.zonedata_full[zone] then Arrival.zonedata_full[zone]={} end 
         if cancreate then 
-           
             table.insert(Arrival.zonedata_full[zone],v)
-            
         end 
     end 
-    
-    
     Threads.CreateLoopCustomOnce('inits',528,function(delay)
         Arrival.ped = PlayerPedId()
         Arrival.pedcoords = GetEntityCoords(Arrival.ped)
-        local zonefull = Arrival.zonedata_full
-        
-        if Arrival.pedzone~='' and Arrival.pedzone ~= Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z) then 
-            
-            local old = Arrival.pedzone
-            
-            if old and #old>0 then 
-                local zonedatasold = zonefull[old]
-                
-                if zonedatasold and #zonedatasold>0 then
-                    
-                    for i=1,#zonedatasold do 
-                        
-                        local v = zonedatasold[i]
-                       
-                        local pos = vector3(v.x,v.y,v.z)
-                        local distance = #(pos-Arrival.pedcoords)
-                        if distance < v.range then
-                            if not v.enter then 
-                                v.enter = true 
-                                if v.arrival then v.arrival(v,'enter') end 
-                               
-                            end 
-                            if v.exit~=nil and v.exit == true then 
-                                v.exit = nil 
-                            end 
-                        end    
-                        if distance >= v.range then
-                            if v.enter~=nil and v.enter == true then 
-                                v.enter = nil 
-                                v.exit = true
-                                if v.arrival then v.arrival(v,'exit') end 
-                               
-                            end 
-                            
-                        end 
-                        
-                        local k = distance*15 > 3000 and 3000 or distance*15
-
-                        delay.setter(528+k)
-                    end 
-                end 
-            end 
-        end 
         Arrival.pedzone = Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z)
-        local zonefull = Arrival.zonedata_full
-        local zonedatasnew = zonefull[Arrival.pedzone]
-       
-        if zonedatasnew and #zonedatasnew>0 then 
-            for i=1,#zonedatasnew do 
-                
-                local v = zonedatasnew[i]
-                local pos = vector3(v.x,v.y,v.z)
-                
-                local distance = #(pos-Arrival.pedcoords)
-                
-                if distance < v.range then
-                    if not v.enter then 
-                        v.enter = true 
-                        
-                        if v.arrival then v.arrival(v,'enter') end 
-                        
-                    end 
-                    if v.exit~=nil and v.exit == true then 
-                        v.exit = nil 
-                    end  
-                end     
-                if distance >= v.range then
-                    if v.enter~=nil  and v.enter == true then 
-                        v.enter = nil 
-                        v.exit = true
-                        if v.arrival then v.arrival(v,'exit') end 
-                       
-                    end 
-                    
+        local zonedatasnew = Arrival.zonedata_full[Arrival.pedzone] 
+        for i=1,#zonedatasnew do 
+            local v = zonedatasnew[i]
+            local pos = vector3(v.x,v.y,v.z)
+            local distance = #(pos-Arrival.pedcoords)
+            if distance < v.range then
+                if not v.enter then 
+                    v.enter = true 
+                    local newv = v
+                    Threads.CreateLoop("lockv"..tostring(newv),528,function(Break)
+                        local pos = vector3(newv.x,newv.y,newv.z)
+                        local distance = #(pos-Arrival.pedcoords)
+                        if distance >= newv.range then
+                            if newv.enter~=nil  and newv.enter == true then 
+                                newv.enter = nil 
+                                newv.exit = true
+                                if newv.arrival then newv.arrival(newv,'exit') end 
+                                Break()
+                            end 
+                        end 
+                    end)
+                    if v.arrival then v.arrival(v,'enter') end 
                 end 
-                local k = distance*15 > 3000 and 3000 or distance*15
-                delay.setter(528+k)
+                if v.exit~=nil and v.exit == true then 
+                    v.exit = nil 
+                end  
+
             end 
+            local k = distance*15 > 3000 and 3000 or distance*15
+            delay.setter(528+k)
+                
         end 
     end)
 end 
-
 Arrival.AddPosition = function (actionname,data,rangeorcb,_cb)
     Arrival.AddPositions(actionname,{data},rangeorcb,_cb)
 end 
-
 Arrival.getnearzones = function(...)
     local _pos = {...}
     if #{...} == 3 then 
@@ -168,33 +105,25 @@ Arrival.getnearzones = function(...)
         end 
         return found 
     end 
-    
         local pos = _pos
     local temp_y = 0.0
-  
         pos = GetObjectOffsetFromCoords(pos,0.0, 0.0, temp_y ,0.0)
         temp_y = temp_y + 8.0
     if not included(GetNameOfZone(pos)) then table.insert(nearzones,GetNameOfZone(pos)) end 
     local pos = Arrival.pedcoords
     local temp_x = 0.0
-    
         pos = GetObjectOffsetFromCoords(pos.x,pos.y,pos.z,0.0, temp_x, 0.0 ,0.0)
         temp_x = temp_x + 8.0
-   
     if not included(GetNameOfZone(pos)) then table.insert(nearzones,GetNameOfZone(pos)) end 
     local pos = Arrival.pedcoords
     local temp_y = 0.0
-
         pos = GetObjectOffsetFromCoords(pos,0.0, 0.0, temp_y ,0.0)
         temp_y = temp_y - 8.0
-    
     if not included(GetNameOfZone(pos)) then table.insert(nearzones,GetNameOfZone(pos)) end 
     local pos = Arrival.pedcoords
     local temp_x = 0.0
- 
         pos = GetObjectOffsetFromCoords(pos,0.0, temp_x, 0.0 ,0.0)
         temp_x = temp_x - 8.0
- 
     if not included(GetNameOfZone(pos)) then table.insert(nearzones,GetNameOfZone(pos)) end 
     return nearzones
 end 
@@ -212,18 +141,14 @@ Arrival.CollectZoneData = function(datatable,range) --vector3 or {x=1.0,y=2.0,z=
         end 
         return found
     end 
-    
     for i=1,#datatable do 
         local v = datatable[i]
-        
         local zone = Arrival.GetHashMethod(v.x,v.y,v.z)
-        
         table.insert(zonedata,{data=v.data,index=v.index,sindex=v.sindex,x=v.x,y=v.y,z=v.z,zone=zone})
         if not included(zone) then 
             table.insert(zonelist,zone) 
         end 
     end 
-    
     return zonelist,zonedata
 end 
 Arrival.ConvertData = function(datatable) 
@@ -231,10 +156,8 @@ Arrival.ConvertData = function(datatable)
     local result = {}
     local tofloat = function(x) return tonumber(x)+0.0 end 
     if #datatable > 0 then
-        
         if type(datatable) == 'table' then 
             local t = datatable[1]
-            
             if type(t) == 'vector3' then 
                 tp = 3
                 local rt = {}
@@ -288,28 +211,21 @@ Arrival.ConvertData = function(datatable)
     if not tp then 
         error('data style not supported2',2)
     else 
-        
     end 
-
     return result --3 vector3,2 normal,1 .x .y .z
 end 
-
 Arrival.GetHashMethod = function(x,y,z)
     local pos = vector3(x,y,z)
-
     result = GetNameOfZone(pos) 
     --print(result)
     return result 
 end 
-
 exports('AddPositions', function(...) --exports.threads:AddPositions
   Arrival.AddPositions(...)
 end)
-
 exports('AddPosition', function(actionname,data,rangeorcb,_cb)  --exports.threads:AddPosition
   Arrival.AddPosition(actionname,data,rangeorcb,_cb)
 end)
-
 --debug 
 --[======[
 if debuglog then 
