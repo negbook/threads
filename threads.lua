@@ -1317,7 +1317,7 @@ else
                         ThisScriptsScaleforms[scaleformName] = true 
                         local num = Threads.Scaleforms.GetTotal()
                         if num > 0 then 
-                          print(GetCurrentResourceName().." is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                          print(GetCurrentResourceName()..":Drawing "..num.." Scaleforms are take about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
                         end 
                     end 
                 end 

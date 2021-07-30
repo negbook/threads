@@ -78,7 +78,7 @@ Threads.TweenCFX.delayCall (object, duration, vars) --from something to the end 
 ```
 
 
-## Modules : Arrival  (dependency with starting Threads script)   
+## Modules : Arrival  
 Add positions and callback when you arrived that place. recommanded range <=5.0  
 Detect if you arrival somewhere positions.It can be a table array or just a position data.  
 When you arrived,callback a data relative to the raw position data.
@@ -89,7 +89,7 @@ Threads.AddPosition
 ```
 [EXAMPLE](https://github.com/negbook/-threads-example-new_banking)  
 
-## Modules : Scaleforms  (dependency with starting Threads script)    
+## Modules : Scaleforms   
 When you draw a scaleforms. It will drawing with Threads script.The perfromances is only effected in Threads script.  
 So you can directly know how you spent your CPU usage with drawing scaleforms.  
 ```
