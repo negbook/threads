@@ -8,7 +8,7 @@ Arrival.ped = nil
 Arrival.pedcoords = vector3(0.0,0.0,0.0)
 Arrival.pedzone = ''
 Arrival.debuglog = true
-
+Arrival_Index = 1
 
 Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
     local fntotable = function(fn) return setmetatable({},{__index=function(t,k) return 'isme' end ,__call=function(t,...) return fn(...) end })  end 
@@ -16,7 +16,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         --local name = actionname
         --local result = {data=datas[sdata.index],data_arrival=sdata,killer=setmetatable({},{__call = function(t,data) if Threads.IsActionOfLoopAlive(name) then Threads.KillActionOfLoop(name) end  end}),spamer={},action=action}
         --result.spamkiller = result.killer
-        local result = {actionname=actionname,data=datas[sdata.index],data_arrival=sdata,action=action}
+        local result = {actionname=actionname,data=datas[sdata.sindex],data_arrival=sdata,action=action}
         
         return _cb(result) 
     end 
@@ -34,6 +34,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         v.range = range
         if not Arrival.zonedata_full[zone] then Arrival.zonedata_full[zone]={} end 
         table.insert(Arrival.zonedata_full[zone],v)
+        
     end 
     
     if  GetCurrentResourceName() ~= resourceName or Arrival.debuglog then
@@ -42,10 +43,14 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
             Arrival.pedcoords = GetEntityCoords(Arrival.ped)
             if Arrival.pedzone ~= Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z,range) then 
                 local old = Arrival.pedzone
+                
                 if old and #old>0 then 
                     local zonedatas = Arrival.zonedata_full[old]
-                    if zonedatas and #zonedatas>0 then 
+                    
+                    if zonedatas and #zonedatas>0 then
+                        
                         for i=1,#zonedatas do 
+                            
                             local v = zonedatas[i]
                             local pos = vector3(v.x,v.y,v.z)
                             local distance = #(pos-Arrival.pedcoords)
@@ -76,12 +81,15 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
             local zonedatas = Arrival.zonedata_full[Arrival.pedzone]
             if zonedatas and #zonedatas>0 then 
                 for i=1,#zonedatas do 
+                    
                     local v = zonedatas[i]
                     local pos = vector3(v.x,v.y,v.z)
+                    
                     local distance = #(pos-Arrival.pedcoords)
                     if distance < v.range then
                         if not v.enter then 
                             v.enter = true 
+                            
                             if v.arrival then v.arrival(v,'enter') end 
                         end 
                         if v.exit~=nil and v.exit == true then 
@@ -174,7 +182,8 @@ Arrival.CollectZoneData = function(datatable,range) --vector3 or {x=1.0,y=2.0,z=
         local v = datatable[i]
         
         local zone = Arrival.GetHashMethod(v.x,v.y,v.z,range)
-        table.insert(zonedata,{data=v.data,index=v.index,x=v.x,y=v.y,z=v.z,zone=zone})
+        
+        table.insert(zonedata,{data=v.data,index=v.index,sindex=v.sindex,x=v.x,y=v.y,z=v.z,zone=zone})
         if not included(zone) then 
             table.insert(zonelist,zone) 
         end 
@@ -193,14 +202,16 @@ Arrival.ConvertData = function(datatable)
                 tp = 3
                 local rt = {}
                 for i=1,#datatable do 
-                    table.insert(rt,{x = tofloat(datatable[i].x),y = tofloat(datatable[i].y),z = tofloat(datatable[i].z),index=i,data=datatable})
+                    table.insert(rt,{x = tofloat(datatable[i].x),y = tofloat(datatable[i].y),z = tofloat(datatable[i].z),index=Arrival_Index,sindex=i,data=datatable})
+                    Arrival_Index = Arrival_Index + 1
                 end 
                 result = rt 
             elseif t.x and t.y and t.z then 
                 tp = 1
                 local rt = {}
                 for i=1,#datatable do 
-                    table.insert(rt,{x = tofloat(datatable[i].x),y = tofloat(datatable[i].y),z = tofloat(datatable[i].z),index=i,data=datatable})
+                    table.insert(rt,{x = tofloat(datatable[i].x),y = tofloat(datatable[i].y),z = tofloat(datatable[i].z),index=Arrival_Index,sindex=i,data=datatable})
+                    Arrival_Index = Arrival_Index + 1
                 end 
                 result = rt 
             elseif #t >=3 then 
@@ -215,7 +226,8 @@ Arrival.ConvertData = function(datatable)
                                 found = true 
                                 local rt = {}
                                 for idx=1,#datatable do 
-                                    table.insert(rt,{x = tofloat(tl) , y = tofloat(tm) , z = tofloat(tr),index=idx,data=datatable})
+                                    table.insert(rt,{x = tofloat(tl) , y = tofloat(tm) , z = tofloat(tr),index=Arrival_Index,sindex=idx,data=datatable})
+                                    Arrival_Index = Arrival_Index + 1
                                 end 
                                 result = rt 
                             else 

@@ -860,9 +860,13 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
         end 
         if Threads_Modules.Draws then 
             Threads.Draws = {}
-            Threads.Draws.PositionText = function(text,coords,duration,cb)
-                exports.threads:positiontext(text,coords,duration,cb)
+            Threads.Draws.PositionText = function(text,coords,duration,ispedrelative)
+                exports.threads:positiontext(text,coords,duration,ispedrelative)
             end 
+            Threads.Draws.PositionMarker = function(coords,rotations,duration,ispedrelative,stylename)
+                exports.threads:positionmarker(coords,rotations,duration,ispedrelative,stylename)
+            end 
+            
         end 
     elseif isServer() then 
         
@@ -1131,11 +1135,12 @@ else
 
             Threads.AddPositions = function(...) --exports.threads:AddPositions
               Threads.Arrival_Local.AddPositions(...)
-            end)
+            end
 
             Threads.AddPosition = function(actionname,data,rangeorcb,_cb)  --exports.threads:AddPosition
+                
               Threads.Arrival_Local.AddPosition(actionname,data,rangeorcb,_cb)
-            end)
+            end
 
         end 
         if Threads_Modules.Scaleforms then 
