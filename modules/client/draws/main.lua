@@ -319,6 +319,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     positionmarker_handle = positionmarker_handle + 1
     local positionmarker_handle = positionmarker_handle
     Threads.AddPosition("positionmarker"..positionmarker_handle,coords,25.0,function(result)
+        
         if result.action == 'enter' then 
             positionmarker_handles[positionmarker_handle] = "hide" 
             Threads.CreateLoopOnce("positionmarker"..positionmarker_handle,0,function(Break)
@@ -328,7 +329,8 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                     if bool then 
                         DrawMarkerStyledAlpha(object)
                     end
-                elseif positionmarker_handles[positionmarker_handle]=="show" then 
+                end 
+                if positionmarker_handles[positionmarker_handle]=="show" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
                     if distance < 20 then 
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
@@ -359,7 +361,8 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                             positionmarker_handles[positionmarker_handle] = "hide" 
                         end,onCompleteArgs={object,positionmarker_handle,pedrelative}})
                     end 
-                elseif positionmarker_handles[positionmarker_handle]=="hide" then 
+                end 
+                if positionmarker_handles[positionmarker_handle]=="hide" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
                     if distance < 20 then 
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
@@ -377,8 +380,9 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                             object._alpha = 0
                             positionmarker_handles[positionmarker_handle] = "hide" 
                         end  
-                    end 
-                elseif positionmarker_handles[positionmarker_handle]=="shoudkill" then  
+                    end
+                end 
+                if positionmarker_handles[positionmarker_handle]=="shoudkill" then  
                     Break()
                 end 
             end )
@@ -390,6 +394,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     end)
 end
 exports('positionmarker', function (coords,rotations,duration,pedrelative,isground,stylename,vars)
+    print(coords,rotations,duration,pedrelative,isground,stylename)
     return positionmarker(coords,rotations,duration,pedrelative,isground,stylename,vars)
 end )
 

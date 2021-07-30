@@ -12,6 +12,7 @@ Arrival.debuglog = true
 Arrival_Index = 1
 
 Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
+    
     local fntotable = function(hash) 
         local fns = Arrival.positiondata_full[hash]
         return setmetatable({},{__index=function(t,k) return 'isme' end ,__call=function(t,...) 
@@ -38,6 +39,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
     
     local zonelist,zonedata = Arrival.CollectZoneData(data,range)
     for i,v in pairs (zonedata) do 
+        
         local zone = v.zone
         local cancreate = false 
         if not Arrival.positiondata_full[tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range)] then 
@@ -47,86 +49,101 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         table.insert(Arrival.positiondata_full[tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range)],cb)
         v.arrival = fntotable(tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range))
         v.range = range
+
+        v.enter = false 
+        v.exit = true 
         if not Arrival.zonedata_full[zone] then Arrival.zonedata_full[zone]={} end 
         if cancreate then 
+           
             table.insert(Arrival.zonedata_full[zone],v)
+            
         end 
     end 
-
     
-    if  GetCurrentResourceName() ~= resourceName or Arrival.debuglog then
-        Threads.CreateLoopCustomOnce('inits',528,function(delay)
-            Arrival.ped = PlayerPedId()
-            Arrival.pedcoords = GetEntityCoords(Arrival.ped)
-            if Arrival.pedzone ~= Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z,range) then 
-                local old = Arrival.pedzone
+    
+    Threads.CreateLoopCustomOnce('inits',528,function(delay)
+        Arrival.ped = PlayerPedId()
+        Arrival.pedcoords = GetEntityCoords(Arrival.ped)
+        local zonefull = Arrival.zonedata_full
+        
+        if Arrival.pedzone ~= Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z) then 
+            local old = Arrival.pedzone
+            
+            if old and #old>0 then 
+                local zonedatasold = zonefull[old]
                 
-                if old and #old>0 then 
-                    local zonedatas = Arrival.zonedata_full[old]
+                if zonedatasold and #zonedatasold>0 then
                     
-                    if zonedatas and #zonedatas>0 then
+                    for i=1,#zonedatasold do 
                         
-                        for i=1,#zonedatas do 
-                            
-                            local v = zonedatas[i]
-                            local pos = vector3(v.x,v.y,v.z)
-                            local distance = #(pos-Arrival.pedcoords)
-                            if distance < v.range then
-                                if not v.enter then 
-                                    v.enter = true 
-                                    if v.arrival then v.arrival(v,'enter') end 
-                                end 
-                                if v.exit and v.exit == true then 
-                                    v.exit = false 
-                                end 
-                            end    
-                            if distance >= v.range then
-                                if v.enter and v.enter == true then 
-                                    v.enter = false 
-                                    v.exit = true
-                                    if v.arrival then v.arrival(v,'exit') end 
-                                end 
-                                
+                        local v = zonedatasold[i]
+                       
+                        local pos = vector3(v.x,v.y,v.z)
+                        local distance = #(pos-Arrival.pedcoords)
+                        if distance < v.range then
+                            if not v.enter then 
+                                v.enter = true 
+                                if v.arrival then v.arrival(v,'enter') end 
+                               
                             end 
-                            local k = distance*15 > 3000 and 3000 or distance*15
-                            delay.setter(528+k)
-                        end 
-                    end 
-                end 
-            end 
-            Arrival.pedzone = Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z,range)
-            local zonedatas = Arrival.zonedata_full[Arrival.pedzone]
-            if zonedatas and #zonedatas>0 then 
-                for i=1,#zonedatas do 
-
-                    local v = zonedatas[i]
-                    local pos = vector3(v.x,v.y,v.z)
-                    
-                    local distance = #(pos-Arrival.pedcoords)
-                    if distance < v.range then
-                        if not v.enter then 
-                            v.enter = true 
+                            if v.exit~=nil and v.exit == true then 
+                                v.exit = nil 
+                            end 
+                        end    
+                        if distance >= v.range then
+                            if v.enter~=nil and v.enter == true then 
+                                v.enter = nil 
+                                v.exit = true
+                                if v.arrival then v.arrival(v,'exit') end 
+                                print("exit1")
+                            end 
                             
-                            if v.arrival then v.arrival(v,'enter') end 
-                        end 
-                        if v.exit  and v.exit == true then 
-                            v.exit = false 
-                        end 
-                    end     
-                    if distance >= v.range then
-                        if v.enter  and v.enter == true then 
-                            v.enter = false 
-                            v.exit = true
-                            if v.arrival then v.arrival(v,'exit') end 
                         end 
                         
+                        local k = distance*15 > 3000 and 3000 or distance*15
+
+                        delay.setter(528+k)
                     end 
-                    local k = distance*15 > 3000 and 3000 or distance*15
-                    delay.setter(528+k)
                 end 
             end 
-        end)
-    end 
+        end 
+        Arrival.pedzone = Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z)
+        local zonefull = Arrival.zonedata_full
+        local zonedatasnew = zonefull[Arrival.pedzone]
+        print(zonedatasnew,Arrival.pedzone)
+        if zonedatasnew and #zonedatasnew>0 then 
+            for i=1,#zonedatasnew do 
+                print(i)
+                local v = zonedatasnew[i]
+                local pos = vector3(v.x,v.y,v.z)
+                
+                local distance = #(pos-Arrival.pedcoords)
+                print(v.range)
+                if distance < v.range then
+                    if not v.enter then 
+                        v.enter = true 
+                        
+                        if v.arrival then v.arrival(v,'enter') end 
+                        
+                    end 
+                    if v.exit~=nil and v.exit == true then 
+                        v.exit = nil 
+                    end  
+                end     
+                if distance >= v.range then
+                    if v.enter~=nil  and v.enter == true then 
+                        v.enter = nil 
+                        v.exit = true
+                        if v.arrival then v.arrival(v,'exit') end 
+                        print("exit2")
+                    end 
+                    
+                end 
+                local k = distance*15 > 3000 and 3000 or distance*15
+                delay.setter(528+k)
+            end 
+        end 
+    end)
 end 
 
 Arrival.AddPosition = function (actionname,data,rangeorcb,_cb)
@@ -198,7 +215,7 @@ Arrival.CollectZoneData = function(datatable,range) --vector3 or {x=1.0,y=2.0,z=
     for i=1,#datatable do 
         local v = datatable[i]
         
-        local zone = Arrival.GetHashMethod(v.x,v.y,v.z,range)
+        local zone = Arrival.GetHashMethod(v.x,v.y,v.z)
         
         table.insert(zonedata,{data=v.data,index=v.index,sindex=v.sindex,x=v.x,y=v.y,z=v.z,zone=zone})
         if not included(zone) then 
@@ -213,8 +230,10 @@ Arrival.ConvertData = function(datatable)
     local result = {}
     local tofloat = function(x) return tonumber(x)+0.0 end 
     if #datatable > 0 then
+        
         if type(datatable) == 'table' then 
             local t = datatable[1]
+            
             if type(t) == 'vector3' then 
                 tp = 3
                 local rt = {}
@@ -263,10 +282,10 @@ Arrival.ConvertData = function(datatable)
             error('Arrival.ConvertData(table)',2)
         end 
     else 
-        error('data style not supported',2)
+        error('data style not supported1',2)
     end 
     if not tp then 
-        error('data style not supported',2)
+        error('data style not supported2',2)
     else 
         
     end 
@@ -274,11 +293,10 @@ Arrival.ConvertData = function(datatable)
     return result --3 vector3,2 normal,1 .x .y .z
 end 
 
-Arrival.GetHashMethod = function(x,y,z,range)
+Arrival.GetHashMethod = function(x,y,z)
     local pos = vector3(x,y,z)
-    local range = range or 1.0
-    local range2 = range*4 > 50.0 and 50.0 or range*4
-    result = GetNameOfZone(pos) .. tostring(math.floor(GetHeightmapTopZForArea(pos.x-range,pos.y-range,pos.x+range,pos.y+range))) .. tostring(math.floor(GetHeightmapBottomZForArea(pos.x-range*2,pos.y-range*2,pos.x+range*2,pos.y+range*2))) .. tostring(math.floor(GetHeightmapBottomZForArea(pos.x-range2,pos.y-range2,pos.x+range2,pos.y+range2)))
+
+    result = GetNameOfZone(pos) 
     --print(result)
     return result 
 end 
@@ -294,7 +312,7 @@ end)
 --debug 
 --[======[
 if debuglog then 
-local thisname = "arrival"
+local thisname = "threads"
 CreateThread(function()
 	if IsDuplicityVersion() then 
 		if GetCurrentResourceName() ~= thisname then 
