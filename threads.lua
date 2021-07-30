@@ -1125,7 +1125,7 @@ else
                 local range = range or 1.0
                 local range2 = range*4 > 50.0 and 50.0 or range*4
                 result = GetNameOfZone(pos) .. tostring(math.floor(GetHeightmapTopZForArea(pos.x-range,pos.y-range,pos.x+range,pos.y+range))) .. tostring(math.floor(GetHeightmapBottomZForArea(pos.x-range*2,pos.y-range*2,pos.x+range*2,pos.y+range*2))) .. tostring(math.floor(GetHeightmapBottomZForArea(pos.x-range2,pos.y-range2,pos.x+range2,pos.y+range2)))
-                --print(result)
+                
                 return result 
             end 
 
@@ -1317,7 +1317,7 @@ else
                         ThisScriptsScaleforms[scaleformName] = true 
                         local num = Threads.Scaleforms.GetTotal()
                         if num > 0 then 
-                            print("Threads is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                          print(GetCurrentResourceName().." is Drawing "..num.." Scaleforms with about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
                         end 
                     end 
                 end 
