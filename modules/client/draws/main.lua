@@ -1,3 +1,4 @@
+local Draws_counts = 0
 local DrawText3DAlpha = function(object)
     local coords = object._coords
     if object._alpha > 0 then 
@@ -27,6 +28,7 @@ end
 local positiontext_handle = 1
 local positiontext_handles = {}
 local positiontext = function(text,coords,duration,pedrelative,font)
+    Draws_counts = Draws_counts + 1
     local object = {}
     object._text = text
     object._alpha = 0
@@ -276,6 +278,7 @@ end
 local positionmarker_handle = 1
 local positionmarker_handles = {}
 local positionmarker = function(coords,rotations,duration,pedrelative,isground,stylename,vars)
+    Draws_counts = Draws_counts + 1
     local object = {}
     stylename = stylename or "default"
     if vars and vars._texturedict and (stylename~="texture" or stylename ~= "texture_light") then 
@@ -398,3 +401,6 @@ exports('positionmarker', function (coords,rotations,duration,pedrelative,isgrou
     return positionmarker(coords,rotations,duration,pedrelative,isground,stylename,vars)
 end )
 
+exports('GetDrawsTotal',function()
+    return Draws_counts or 0
+end)

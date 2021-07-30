@@ -364,6 +364,6 @@ exports('DrawScaleformMovie3DSpeical', function (scaleformName,ped,...)
     end)
 end)
 
-exports('GetTotal',function()
+exports('GetScaleformsTotal',function()
     return Scaleforms and Scaleforms.main and Scaleforms.main.counts or 0
 end)

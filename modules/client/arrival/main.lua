@@ -66,7 +66,8 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         Arrival.pedcoords = GetEntityCoords(Arrival.ped)
         local zonefull = Arrival.zonedata_full
         
-        if Arrival.pedzone ~= Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z) then 
+        if Arrival.pedzone~='' and Arrival.pedzone ~= Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z) then 
+            
             local old = Arrival.pedzone
             
             if old and #old>0 then 

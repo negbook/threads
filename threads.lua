@@ -113,7 +113,7 @@ Threads.CreateLoopCustom = function(...) --actionname,defaulttimer(and ID of tim
     Threads_Custom_VarTimer[varname] = defaulttimer
     if debuglog then 
         print("Linked VarName '"..varname .. "' to a Custom Timer")
-        print('threads:CreateLoopCustom:Varname:'..varname,"actionname: ".. name) 
+        print('threads(debug):CreateLoopCustom:Varname:'..varname,"actionname: ".. name) 
     end
     Threads.loop2_custom(name,defaulttimer,func,varname)
     if Threads_Custom_Handle >= 65530 then Threads_Custom_Handle = 1 end 
@@ -152,9 +152,9 @@ Threads.CreateLoopOnceCustom = function(...)
     Threads_Custom_VarTimer[varname] = defaulttimer
     if debuglog then 
         print("Linked VarName '"..varname .. "' to a Custom Timer")
-        print('threads:CreateLoopOnceCustom:Varname:'..varname,"actionname: ".. name) 
+        print('threads(debug):CreateLoopOnceCustom:Varname:'..varname,"actionname: ".. name) 
     end
-        if debuglog then print('threads:CreateLoopOnce:CreateThread:'..defaulttimer, name) end
+        if debuglog then print('threads(debug):CreateLoopOnce:CreateThread:'..defaulttimer, name) end
         Threads.loop2_custom(name,defaulttimer,func,varname)
         Threads_Custom_Once[name] = true 
     end 
@@ -178,7 +178,7 @@ Threads.KillLoopCustom = function(name,timer)
     Threads_Custom_Timers[name] = nil 
     Threads_Custom_ActionTables[timer] = nil	
     Threads_Custom_Once[name]  = nil
-    if debuglog then print('threads:KillLoopCustom:'..name,timer) end
+    if debuglog then print('threads(debug):KillLoopCustom:'..name,timer) end
 end 
 Threads.KillActionOfLoopCustom = function(name)
     for timer,_name in pairs (Threads_Custom_ActionTables) do 
@@ -197,7 +197,7 @@ Threads.KillActionOfLoopCustom = function(name)
     Threads_Custom_Alive[name] = false 
     Threads_Custom_Once[name] = false 
     Threads_Custom_Functions[name] = nil
-    if debuglog then print('threads:KillActionOfLoopCustom:'..name) end
+    if debuglog then print('threads(debug):KillActionOfLoopCustom:'..name) end
 end 
 Threads.KillHandleOfLoopCustom = function(handle)
     if Threads_Custom_Handle[handle] then 
@@ -245,7 +245,7 @@ Threads.ClearThreadOnce = function(name)
     Threads_OnceThread[name] = nil 
 end 
 Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
-    if debuglog then print('threads:CreateLoad:'..thing) end
+    if debuglog then print('threads(debug):CreateLoad:'..thing) end
     local handle = loadfunc(thing)
     local SinceTime = GetGameTimer()
     local failed = false
@@ -282,7 +282,7 @@ Threads.CreateLoad = function(thing,loadfunc,checkfunc,cb)
         BusyspinnerOff()
     end 
     if failed then
-        if debuglog then print('threads:CreateLoad:'..thing.."Loading Failed") end
+        if debuglog then print('threads(debug):CreateLoad:'..thing.."Loading Failed") end
     elseif nowcb then  
         cb(nowcb)
     end 
@@ -301,7 +301,7 @@ Threads.loop = function()error("Outdated",2) end
 Threads.loop2 = function(_name,_timer,_func)
     if Threads_Once[_name] then return end 
 	if debuglog and not _timer then 
-		print("[BAD Hobbits]Some Threads.loop2 timer is nil on "..GetCurrentResourceName())
+		print("threads(debug):[BAD Hobbits]Some Threads.loop2 timer is nil on "..GetCurrentResourceName())
 	end 
     local name = _name or tostring(_func)
     local timer = _timer>=0 and _timer or 0
@@ -377,7 +377,7 @@ Threads.CreateLoop = function(...)
         timer = 0
         func = tbl[1]
     end 
-    if debuglog then print('threads:CreateLoop:CreateThread:'..timer, name) end
+    if debuglog then print('threads(debug):CreateLoop:CreateThread:'..timer, name) end
     Threads.loop2(name,timer,func)
     if Threads_Handle >= 65530 then Threads_Handle = 1 end 
     Threads_Handle = Threads_Handle + 1
@@ -402,7 +402,7 @@ Threads.CreateLoopOnce = function(...)
         func = tbl[1]
     end 
     if not Threads_Once[name] then 
-        if debuglog then print('threads:CreateLoopOnce:CreateThread:'..timer, name) end
+        if debuglog then print('threads(debug):CreateLoopOnce:CreateThread:'..timer, name) end
         Threads.loop2(name,timer,func)
         Threads_Once[name] = true 
     end 
@@ -425,7 +425,7 @@ Threads.KillLoop = function(name,timer)
     Threads_ActionTables[timer] = nil	
     Threads_Once[name]  = nil
 
-    if debuglog then print('threads:KillLoop:'..name,timer) end
+    if debuglog then print('threads(debug):KillLoop:'..name,timer) end
 end 
 Threads.KillActionOfLoop = function(name)
     for timer,_name in pairs (Threads_ActionTables) do 
@@ -445,7 +445,7 @@ Threads.KillActionOfLoop = function(name)
     Threads_Once[name] = nil 
     Threads_Functions[name] = nil
     
-    if debuglog then print('threads:KillLoop:'..name) end
+    if debuglog then print('threads(debug):KillLoop:'..name) end
 end 
 Threads.KillHandleOfLoop = function(handle)
     if Threads_Handles[handle] then 
@@ -453,7 +453,6 @@ Threads.KillHandleOfLoop = function(handle)
     end 
 end 
 Threads.Break = function(name)
-    print(name)
     if Threads.IsActionOfLoopAlive(name) then Threads.KillActionOfLoop(name) end 
 end 
 Threads.BreakCustom = function(name)
@@ -743,6 +742,25 @@ end
 if GetResourceState("threads")=="started" or GetResourceState("threads")=="starting" then 
     local isClient = function() return not IsDuplicityVersion() end 
     local isServer = function() return IsDuplicityVersion() end 
+    local RefreshWarning = function()
+        AllDrawsTotal = 0
+        if Threads.Scaleforms.GetScaleformsTotal and exports.threads:GetScaleformsTotal() > 0 then 
+            local num = exports.threads:GetScaleformsTotal()
+            if num > 0 then 
+                AllDrawsTotal = AllDrawsTotal + num
+            end 
+        end 
+        if Threads.Draws.GetDrawsTotal and exports.threads:GetDrawsTotal() > 0 then 
+            local num = exports.threads:GetDrawsTotal()
+            if num > 0 then 
+                AllDrawsTotal = AllDrawsTotal + num
+            end 
+        end 
+        if debuglog then   
+        print("threads(debug):Drawing "..AllDrawsTotal.." stuffs in the same time will take about "..string.format("0.%02d~0.%02d",AllDrawsTotal,AllDrawsTotal+1) .. "ms")
+        end             
+    end 
+    local AllDrawsTotal = 0
     if isClient() then --client
         if Threads_Modules.Arrival then 
             Threads.AddPositions = function(actionname,datas,rangeorcb,_cb)
@@ -776,20 +794,7 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
                 ThisScriptsScaleforms = {}
             end 
 
-            AddEventHandler('onResourceStop', function(resourceName)
-               
-              if (GetCurrentResourceName() ~= resourceName) then
-                return
-              end
-              --print(this.scriptName,resourceName,GetCurrentResourceName() ,ThisScriptsScaleforms)
-              --print('The resource ' .. resourceName .. ' was stopped.')
-              if resourceName ~= this.scriptName then 
-                  for i,v in pairs( ThisScriptsScaleforms ) do 
-                    --print(i,v)
-                    Threads.Scaleforms.End(i)
-                  end 
-              end 
-            end)
+            
 
             Threads.Scaleforms.Call = function(scaleformName,cb) 
                 
@@ -798,9 +803,10 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
                 if GetCurrentResourceName() ~= this.scriptName then 
                     if not ThisScriptsScaleforms[scaleformName] then 
                         ThisScriptsScaleforms[scaleformName] = true 
-                        local num = Threads.Scaleforms.GetTotal()
-                        if num > 0 then 
-                            print("Threads:Drawing "..num.." Scaleforms are take about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                        local num = Threads.Scaleforms.GetScaleformsTotal()
+                        if debuglog and num > 0 then 
+                            print("threads(debug):Drawing "..num.." Scaleforms in the same time will take about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                            RefreshWarning()
                         end 
                     end 
                 end 
@@ -815,7 +821,20 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
             Threads.Scaleforms.End = function(scaleformName)
                 exports.threads:EndScaleformMovie(scaleformName)
             end; Threads.Scaleforms.Kill = Threads.Scaleforms.End
-            
+            AddEventHandler('onResourceStop', function(resourceName)
+               
+              if (GetCurrentResourceName() ~= resourceName) then
+                return
+              end
+              --print(this.scriptName,resourceName,GetCurrentResourceName() ,ThisScriptsScaleforms)
+              --print('The resource ' .. resourceName .. ' was stopped.')
+              if resourceName ~= this.scriptName then 
+                  for i,v in pairs( ThisScriptsScaleforms ) do 
+                    print(i,v)
+                    Threads.Scaleforms.End(i)
+                  end 
+              end 
+            end)
             Threads.Scaleforms.RequestCallback = function(scaleformName,SfunctionName,...) 
                 exports.threads:RequestScaleformCallbackAny(scaleformName,SfunctionName,...) 
             end
@@ -837,38 +856,50 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
                 exports.threads:DrawScaleformMovie3DSpeical(scaleformName,ped,...) 
             end
 
-            Threads.Scaleforms.GetTotal = function()
-                return exports.threads:GetTotal()
+            Threads.Scaleforms.GetScaleformsTotal = function()
+                return exports.threads:GetScaleformsTotal()
             end
             
-            if GetCurrentResourceName() == this.scriptName and not IsDuplicityVersion() then 
-                
-                    CreateThread(function()
-                        if Threads.Scaleforms.GetTotal and exports.threads:GetTotal() > 0 then 
-                            while true do 
-                                local num = exports.threads:GetTotal()
-                                if num > 0 then 
-                                    print("Threads:Drawing "..num.." Scaleforms are take about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
-                                end 
-                                Wait(60000)
-                            end 
-                            return 
-                        end 
-                        return
-                    end)
-                
-            end 
+
         end 
         if Threads_Modules.Draws then 
             Threads.Draws = {}
             Threads.Draws.PositionText = function(text,coords,duration,ispedrelative,font)
+                if GetCurrentResourceName() ~= this.scriptName then 
+                    local num = Threads.Draws.GetDrawsTotal()
+                    if debuglog and num > 0 then 
+                        print("threads(debug):Drawing "..num.." Draws are take about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                        RefreshWarning()
+                    end 
+                end 
                 exports.threads:positiontext(text,coords,duration,ispedrelative,font)
             end 
             Threads.Draws.PositionMarker = function(coords,rotations,duration,ispedrelative,isground,stylename,vars)
+                if GetCurrentResourceName() ~= this.scriptName then 
+                    local num = Threads.Draws.GetDrawsTotal()
+                    if debuglog and num > 0 then 
+                        print("threads(debug):Drawing "..num.." Draws are take about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
+                        RefreshWarning()
+                    end 
+                end 
                 exports.threads:positionmarker(coords,rotations,duration,ispedrelative,isground,stylename,vars)
             end 
-            
+            Threads.Draws.GetDrawsTotal = function()
+                return exports.threads:GetDrawsTotal()
+            end
+
         end 
+        
+        if GetCurrentResourceName() == this.scriptName and not IsDuplicityVersion() then 
+            CreateThread(function()
+                while true do 
+                    RefreshWarning()
+                    Wait(60000)
+                end 
+                return
+            end)
+        end 
+        
     elseif isServer() then 
         
     end 
@@ -1056,8 +1087,8 @@ else
                 if GetCurrentResourceName() ~= this.scriptName then 
                     if not ThisScriptsScaleforms[scaleformName] then 
                         ThisScriptsScaleforms[scaleformName] = true 
-                        local num = Threads.Scaleforms.GetTotal()
-                        if num > 0 then 
+                        local num = Threads.Scaleforms.GetScaleformsTotal()
+                        if debuglog and num > 0 then 
                           print(GetCurrentResourceName()..":Drawing "..num.." Scaleforms are take about "..string.format("0.%02d~0.%02d",num,num+1) .. "ms")
                         end 
                     end 
