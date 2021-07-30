@@ -147,6 +147,7 @@ NormalStyledMarkers["door"] = function(object)
     object._r = 255
     object._g = 255
     object._b = 0
+    object._z = object._z + 1.0
 end 
 NormalStyledMarkers["entrance"] = NormalStyledMarkers["door"]
 NormalStyledMarkers["enter"] = NormalStyledMarkers["door"]
@@ -163,12 +164,14 @@ NormalStyledMarkers["dollors"] = function(object)
     object._g = 255
     object._b = 0
     object._spin = true
+    object._z = object._z + 1.0
 end 
 NormalStyledMarkers["money"] = NormalStyledMarkers["dollors"]
 NormalStyledMarkers["dollor"] = NormalStyledMarkers["dollors"]
 
 
 NormalStyledMarkers["targetpoint"] = function(object)
+    
     object._type = 25
     object._float = false
     object._pointcam = false
@@ -187,9 +190,9 @@ NormalStyledMarkers["default"] = function(object)
     object._type = 1
     object._float = false
     object._pointcam = false
-    object._xscale = 1.0
-    object._yscale = 1.0
-    object._zscale = 1.0
+    object._xscale = 1.5
+    object._yscale = 1.5
+    object._zscale = 1.5
     object._r = 255
     object._g = 0
     object._b = 0
@@ -230,11 +233,26 @@ end
 
 local positionmarker_handle = 1
 local positionmarker_handles = {}
-local positionmarker = function(coords,rotations,duration,pedrelative,stylename)
+local positionmarker = function(coords,rotations,duration,pedrelative,isground,stylename)
     local object = {}
     stylename = stylename or "default"
-    NormalStyledMarkers[stylename:lower()](object)
     
+    if isground then 
+        local topz = coords.z
+        local bottomz = GetHeightmapBottomZForPosition(coords.x,coords.y)
+        local steps = (topz-bottomz)/100
+        
+        local foundGround
+        local height = topz + 0.0
+        local groundz
+        
+        while not foundGround and height > bottomz  do 
+            foundGround, groundz = GetGroundZFor_3dCoord(coords.x,coords.y, height,1 )
+            height = height - steps
+        end 
+        
+        coords = vector3(coords.x,coords.y,groundz)
+    end 
     object._x = coords.x 
     object._y = coords.y
     object._z = coords.z
@@ -243,7 +261,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,stylename)
     object._zrotation = rotations.z
     
     object._alpha = 0
-    
+    NormalStyledMarkers[stylename:lower()](object)
     local durationIn,durationHold,durationOut
     if durationIn == nil then durationIn = duration end 
     if durationHold == nil then durationHold = 0 end 
@@ -254,7 +272,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,stylename)
     if positionmarker_handle > 65530 then positionmarker_handle = 1 end 
     positionmarker_handle = positionmarker_handle + 1
     local positionmarker_handle = positionmarker_handle
-    Threads.AddPosition("positionmarker"..positionmarker_handle,coords,10.0,function(result)
+    Threads.AddPosition("positionmarker"..positionmarker_handle,coords,20.0,function(result)
         
         if result.action == 'enter' then 
             print(positionmarker_handle)
@@ -268,7 +286,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,stylename)
                     end
                 elseif positionmarker_handles[positionmarker_handle]=="show" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
-                    if distance < 8 then 
+                    if distance < 16 then 
                         
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                         local bool2 = true 
@@ -300,7 +318,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,stylename)
                     end 
                 elseif positionmarker_handles[positionmarker_handle]=="hide" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
-                    if distance < 8 then 
+                    if distance < 16 then 
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                         local bool2 = true
                         if pedrelative then bool2 = IsPedHeadingTowardsPosition(PlayerPedId(), coords.x,coords.y,coords.z,90.0) end 
@@ -327,8 +345,8 @@ local positionmarker = function(coords,rotations,duration,pedrelative,stylename)
     end)
     
 end
-exports('positionmarker', function (coords,rotations,duration,pedrelative,stylename)
-    return positionmarker(coords,rotations,duration,pedrelative,stylename)
+exports('positionmarker', function (coords,rotations,duration,pedrelative,isground,stylename)
+    return positionmarker(coords,rotations,duration,pedrelative,isground,stylename)
 end )
 
 

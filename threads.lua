@@ -863,8 +863,8 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
             Threads.Draws.PositionText = function(text,coords,duration,ispedrelative)
                 exports.threads:positiontext(text,coords,duration,ispedrelative)
             end 
-            Threads.Draws.PositionMarker = function(coords,rotations,duration,ispedrelative,stylename)
-                exports.threads:positionmarker(coords,rotations,duration,ispedrelative,stylename)
+            Threads.Draws.PositionMarker = function(coords,rotations,duration,ispedrelative,isground,stylename)
+                exports.threads:positionmarker(coords,rotations,duration,ispedrelative,isground,stylename)
             end 
             
         end 
@@ -887,7 +887,7 @@ else
             Threads.Arrival_Local.pedcoords = vector3(0.0,0.0,0.0)
             Threads.Arrival_Local.pedzone = ''
             Threads.Arrival_Local.debuglog = true
-
+            Arrival_Index = 1
 
             Threads.Arrival_Local.AddPositions = function (actionname,datas,rangeorcb,_cb)
                 local fntotable = function(fn) return setmetatable({},{__index=function(t,k) return 'isme' end ,__call=function(t,...) return fn(...) end })  end 
@@ -895,7 +895,7 @@ else
                     --local name = actionname
                     --local result = {data=datas[sdata.index],data_arrival=sdata,killer=setmetatable({},{__call = function(t,data) if Threads.IsActionOfLoopAlive(name) then Threads.KillActionOfLoop(name) end  end}),spamer={},action=action}
                     --result.spamkiller = result.killer
-                    local result = {actionname=actionname,data=datas[sdata.index],data_arrival=sdata,action=action}
+                    local result = {actionname=actionname,data=datas[sdata.sindex],data_arrival=sdata,action=action}
                     
                     return _cb(result) 
                 end 
@@ -913,6 +913,7 @@ else
                     v.range = range
                     if not Threads.Arrival_Local.zonedata_full[zone] then Threads.Arrival_Local.zonedata_full[zone]={} end 
                     table.insert(Threads.Arrival_Local.zonedata_full[zone],v)
+                    
                 end 
                 
                 if  GetCurrentResourceName() ~= resourceName or Threads.Arrival_Local.debuglog then
@@ -921,10 +922,14 @@ else
                         Threads.Arrival_Local.pedcoords = GetEntityCoords(Threads.Arrival_Local.ped)
                         if Threads.Arrival_Local.pedzone ~= Threads.Arrival_Local.GetHashMethod(Threads.Arrival_Local.pedcoords.x,Threads.Arrival_Local.pedcoords.y,Threads.Arrival_Local.pedcoords.z,range) then 
                             local old = Threads.Arrival_Local.pedzone
+                            
                             if old and #old>0 then 
                                 local zonedatas = Threads.Arrival_Local.zonedata_full[old]
-                                if zonedatas and #zonedatas>0 then 
+                                
+                                if zonedatas and #zonedatas>0 then
+                                    
                                     for i=1,#zonedatas do 
+                                        
                                         local v = zonedatas[i]
                                         local pos = vector3(v.x,v.y,v.z)
                                         local distance = #(pos-Threads.Arrival_Local.pedcoords)
@@ -955,12 +960,15 @@ else
                         local zonedatas = Threads.Arrival_Local.zonedata_full[Threads.Arrival_Local.pedzone]
                         if zonedatas and #zonedatas>0 then 
                             for i=1,#zonedatas do 
+                                
                                 local v = zonedatas[i]
                                 local pos = vector3(v.x,v.y,v.z)
+                                
                                 local distance = #(pos-Threads.Arrival_Local.pedcoords)
                                 if distance < v.range then
                                     if not v.enter then 
                                         v.enter = true 
+                                        
                                         if v.arrival then v.arrival(v,'enter') end 
                                     end 
                                     if v.exit~=nil and v.exit == true then 
@@ -1053,7 +1061,8 @@ else
                     local v = datatable[i]
                     
                     local zone = Threads.Arrival_Local.GetHashMethod(v.x,v.y,v.z,range)
-                    table.insert(zonedata,{data=v.data,index=v.index,x=v.x,y=v.y,z=v.z,zone=zone})
+                    
+                    table.insert(zonedata,{data=v.data,index=v.index,sindex=v.sindex,x=v.x,y=v.y,z=v.z,zone=zone})
                     if not included(zone) then 
                         table.insert(zonelist,zone) 
                     end 
@@ -1072,14 +1081,16 @@ else
                             tp = 3
                             local rt = {}
                             for i=1,#datatable do 
-                                table.insert(rt,{x = tofloat(datatable[i].x),y = tofloat(datatable[i].y),z = tofloat(datatable[i].z),index=i,data=datatable})
+                                table.insert(rt,{x = tofloat(datatable[i].x),y = tofloat(datatable[i].y),z = tofloat(datatable[i].z),index=Arrival_Index,sindex=i,data=datatable})
+                                Arrival_Index = Arrival_Index + 1
                             end 
                             result = rt 
                         elseif t.x and t.y and t.z then 
                             tp = 1
                             local rt = {}
                             for i=1,#datatable do 
-                                table.insert(rt,{x = tofloat(datatable[i].x),y = tofloat(datatable[i].y),z = tofloat(datatable[i].z),index=i,data=datatable})
+                                table.insert(rt,{x = tofloat(datatable[i].x),y = tofloat(datatable[i].y),z = tofloat(datatable[i].z),index=Arrival_Index,sindex=i,data=datatable})
+                                Arrival_Index = Arrival_Index + 1
                             end 
                             result = rt 
                         elseif #t >=3 then 
@@ -1094,7 +1105,8 @@ else
                                             found = true 
                                             local rt = {}
                                             for idx=1,#datatable do 
-                                                table.insert(rt,{x = tofloat(tl) , y = tofloat(tm) , z = tofloat(tr),index=idx,data=datatable})
+                                                table.insert(rt,{x = tofloat(tl) , y = tofloat(tm) , z = tofloat(tr),index=Arrival_Index,sindex=idx,data=datatable})
+                                                Arrival_Index = Arrival_Index + 1
                                             end 
                                             result = rt 
                                         else 
@@ -1129,7 +1141,7 @@ else
                 local range = range or 1.0
                 local range2 = range*4 > 50.0 and 50.0 or range*4
                 result = GetNameOfZone(pos) .. tostring(math.floor(GetHeightmapTopZForArea(pos.x-range,pos.y-range,pos.x+range,pos.y+range))) .. tostring(math.floor(GetHeightmapBottomZForArea(pos.x-range*2,pos.y-range*2,pos.x+range*2,pos.y+range*2))) .. tostring(math.floor(GetHeightmapBottomZForArea(pos.x-range2,pos.y-range2,pos.x+range2,pos.y+range2)))
-                
+                --print(result)
                 return result 
             end 
 
@@ -1138,7 +1150,6 @@ else
             end
 
             Threads.AddPosition = function(actionname,data,rangeorcb,_cb)  --exports.threads:AddPosition
-                
               Threads.Arrival_Local.AddPosition(actionname,data,rangeorcb,_cb)
             end
 
