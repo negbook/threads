@@ -1,6 +1,7 @@
 local Arrival = {}
 setmetatable(Arrival, { __index = Threads })
 Arrival.zonedata_full = {}
+Arrival.positiondata_full = {}
 Arrival.currentzonedata = {}
 
 
@@ -11,7 +12,14 @@ Arrival.debuglog = true
 Arrival_Index = 1
 
 Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
-    local fntotable = function(fn) return setmetatable({},{__index=function(t,k) return 'isme' end ,__call=function(t,...) return fn(...) end })  end 
+    local fntotable = function(hash) 
+        local fns = Arrival.positiondata_full[hash]
+        return setmetatable({},{__index=function(t,k) return 'isme' end ,__call=function(t,...) 
+            for i=1,#fns do 
+                fns[i](...) 
+            end 
+        end })  
+    end 
     local cooked_cb = function(sdata,action)
         --local name = actionname
         --local result = {data=datas[sdata.index],data_arrival=sdata,killer=setmetatable({},{__call = function(t,data) if Threads.IsActionOfLoopAlive(name) then Threads.KillActionOfLoop(name) end  end}),spamer={},action=action}
@@ -27,15 +35,24 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         cb = rangeorcb 
     end 
     local data = Arrival.ConvertData(datas)  -- to .x .y .z .index 
+    
     local zonelist,zonedata = Arrival.CollectZoneData(data,range)
     for i,v in pairs (zonedata) do 
         local zone = v.zone
-        v.arrival = fntotable(cb)
+        local cancreate = false 
+        if not Arrival.positiondata_full[tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range)] then 
+            Arrival.positiondata_full[tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range)] = {} 
+            cancreate = true 
+        end 
+        table.insert(Arrival.positiondata_full[tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range)],cb)
+        v.arrival = fntotable(tostring(v.x)..tostring(v.y)..tostring(v.z)..tostring(range))
         v.range = range
         if not Arrival.zonedata_full[zone] then Arrival.zonedata_full[zone]={} end 
-        table.insert(Arrival.zonedata_full[zone],v)
-        
+        if cancreate then 
+            table.insert(Arrival.zonedata_full[zone],v)
+        end 
     end 
+
     
     if  GetCurrentResourceName() ~= resourceName or Arrival.debuglog then
         Threads.CreateLoopCustomOnce('inits',528,function(delay)
@@ -59,12 +76,12 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
                                     v.enter = true 
                                     if v.arrival then v.arrival(v,'enter') end 
                                 end 
-                                if v.exit~=nil and v.exit == true then 
+                                if v.exit and v.exit == true then 
                                     v.exit = false 
                                 end 
-                                
-                            else 
-                                if v.enter~=nil and v.enter == true then 
+                            end    
+                            if distance >= v.range then
+                                if v.enter and v.enter == true then 
                                     v.enter = false 
                                     v.exit = true
                                     if v.arrival then v.arrival(v,'exit') end 
@@ -81,7 +98,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
             local zonedatas = Arrival.zonedata_full[Arrival.pedzone]
             if zonedatas and #zonedatas>0 then 
                 for i=1,#zonedatas do 
-                    
+
                     local v = zonedatas[i]
                     local pos = vector3(v.x,v.y,v.z)
                     
@@ -92,12 +109,12 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
                             
                             if v.arrival then v.arrival(v,'enter') end 
                         end 
-                        if v.exit~=nil and v.exit == true then 
+                        if v.exit  and v.exit == true then 
                             v.exit = false 
                         end 
-                        
-                    else 
-                        if v.enter~=nil and v.enter == true then 
+                    end     
+                    if distance >= v.range then
+                        if v.enter  and v.enter == true then 
                             v.enter = false 
                             v.exit = true
                             if v.arrival then v.arrival(v,'exit') end 

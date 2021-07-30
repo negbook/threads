@@ -281,6 +281,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     if vars and vars._texturedict and (stylename~="texture" or stylename ~= "texture_light") then 
         stylename = "texture"
     end 
+    local objcoords = coords
     if isground then 
         local topz = coords.z
         local bottomz = GetHeightmapBottomZForPosition(coords.x,coords.y)
@@ -292,11 +293,11 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
             foundGround, groundz = GetGroundZFor_3dCoord(coords.x,coords.y, height,1 )
             height = height - steps
         end 
-        coords = vector3(coords.x,coords.y,groundz)
+        objcoords = vector3(coords.x,coords.y,groundz)
     end 
-    object._x = coords.x 
-    object._y = coords.y
-    object._z = coords.z
+    object._x = objcoords.x 
+    object._y = objcoords.y
+    object._z = objcoords.z
     object._xrotation = rotations.x
     object._yrotation = rotations.y
     object._zrotation = rotations.z
