@@ -73,8 +73,8 @@ You can Draw it (while wait 0 ) to show how it tween the value like alpha 255 22
 ```
 Threads.TweenCFX.removeTween (object)  --cancel a tween
 Threads.TweenCFX.endTween (object, forceComplete)  --force to the end of tween
-Threads.TweenCFX.to (object, duration, vars)  --from something to the end in the duration time such as alpha
-Threads.TweenCFX.delayCall (object, duration, vars) --from something to the end in the duration time such as alpha but not change/tween anything.
+Threads.TweenCFX.to (object, duration, vars)  --from a value of something to the end in the duration time such as alpha
+Threads.TweenCFX.delayCall (object, duration, vars) --from a value of something to the end in the duration time such as alpha but not change/tween anything.
 ```
 
 
