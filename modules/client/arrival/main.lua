@@ -47,7 +47,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
             table.insert(Arrival.zonedata_full[zone],v)
         end 
     end 
-    Threads.CreateLoopCustomOnce('inits',528,function(delay)
+    Threads.CreateLoopOnce('inits',528,function(Break1)
         Arrival.ped = PlayerPedId()
         Arrival.pedcoords = GetEntityCoords(Arrival.ped)
         Arrival.pedzone = Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z)
@@ -61,7 +61,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
                 if not v.enter then 
                     v.enter = true 
                     local newv = v
-                    Threads.CreateLoop("lockv"..tostring(newv),528,function(Break)
+                    Threads.CreateLoop("lockv"..tostring(newv),528,function(Break2)
                         local pos = vector3(newv.x,newv.y,newv.z)
                         local distance = #(pos-Arrival.pedcoords)
                         if distance >= newv.range then
@@ -69,7 +69,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
                                 newv.enter = nil 
                                 newv.exit = true
                                 if newv.arrival then newv.arrival(newv,'exit') end 
-                                Break()
+                                Break2()
                             end 
                         end 
                     end)
@@ -80,10 +80,10 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
                 end  
 
             end 
-            local k = distance*15 > 3000 and 3000 or distance*15
-            table.insert(ks,528+k)
+            --local k = distance*15 > 3000 and 3000 or distance*15
+            --table.insert(ks,528+k)
         end 
-        delay.setter(math.min(table.unpack(ks)))
+        --delay.setter(math.min(table.unpack(ks)))
     end)
 end 
 Arrival.AddPosition = function (actionname,data,rangeorcb,_cb)
