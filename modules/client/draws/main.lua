@@ -203,12 +203,13 @@ NormalStyledMarkers["texture_light"] = function(object)
     object._spin = false
 end 
 local DrawMarkerStyledAlpha = function(object)
+    
     if object._shadow then 
         DrawMarker(
         object._type or 0, 
         object._x , 
         object._y , 
-        object._z+object._shadow , 
+        object._z-object._shadow , 
         0.0 , 
         0.0 , 
         0.0 , 
@@ -228,7 +229,8 @@ local DrawMarkerStyledAlpha = function(object)
         object._spin or false , 
         object._texturedict or 0 , 
         object._texturename or 0, 
-        0
+        0,
+        1
         )
         DrawMarker(
         object._type or 0, 
@@ -254,7 +256,8 @@ local DrawMarkerStyledAlpha = function(object)
         object._spin or false , 
         object._texturedict or 0 , 
         object._texturename or 0, 
-        0
+        0,
+        1
         )
     else 
         DrawMarker(
@@ -281,7 +284,8 @@ local DrawMarkerStyledAlpha = function(object)
         object._spin or false , 
         object._texturedict or 0 , 
         object._texturename or 0, 
-        0
+        0,
+        1
         )
     end 
     
@@ -320,8 +324,11 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     object._xrotation = rotations.x
     object._yrotation = rotations.y
     object._zrotation = rotations.z
+    
+    
     if vars then 
         for i,v in pairs(vars) do 
+            
             object[i] = v
         end 
     end 
@@ -364,7 +371,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                         else 
                             if bool then 
                                 if math.floor(object._alpha) == 0 then 
-                                    Threads.TweenCFX.to(object,durationIn,{_alpha=255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positionmarker_handle,pedrelative)
+                                    Threads.TweenCFX.to(object,durationIn,{_alpha=vars._toalpha or 255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positionmarker_handle,pedrelative)
                                     end,onCompleteArgs={object,positionmarker_handle,pedrelative}})
                                 end 
                                 DrawNextOrder(positionmarker_handle)
@@ -390,7 +397,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                         if bool and bool2 then 
                             positionmarker_handles[positionmarker_handle] = "unshow" 
                             if math.floor(object._alpha) == 0 then 
-                                Threads.TweenCFX.to(object,durationIn,{_alpha=255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positionmarker_handle,pedrelative)
+                                Threads.TweenCFX.to(object,durationIn,{_alpha=vars._toalpha or 255,ease=Threads.TweenCFX.Ease.LinearNone,onCompleteScope=function(object,positionmarker_handle,pedrelative)
                                     positionmarker_handles[positionmarker_handle] = "show" 
                                 end,onCompleteArgs={object,positionmarker_handle,pedrelative}})
                             end 
