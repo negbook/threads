@@ -41,8 +41,7 @@ end
 local positiontext_handle = 1
 local positiontext_handles = {}
 local positiontext = function(text,coords,duration,pedrelative)
-    local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
-    if bool then 
+    
         local object = {}
         object._text = text
         object._x = xper
@@ -131,7 +130,7 @@ local positiontext = function(text,coords,duration,pedrelative)
                 positiontext_handles[positiontext_handle] = "shoudkill"
             end 
         end)
-    end 
+     
 end
 exports('positiontext', function (text,coords,duration,pedrelative)
     return positiontext(text,coords,duration,pedrelative)
