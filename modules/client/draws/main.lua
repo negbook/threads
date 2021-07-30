@@ -57,7 +57,7 @@ local positiontext = function(text,coords,duration,pedrelative)
     if positiontext_handle > 65530 then positiontext_handle = 1 end 
     positiontext_handle = positiontext_handle + 1
     local positiontext_handle = positiontext_handle
-    Threads.AddPosition("positiontext"..positiontext_handle,coords,10.0,function(result)
+    Threads.AddPosition("positiontext"..positiontext_handle,coords,25.0,function(result)
         
         if result.action == 'enter' then 
             
@@ -72,7 +72,7 @@ local positiontext = function(text,coords,duration,pedrelative)
                     end
                 elseif positiontext_handles[positiontext_handle]=="show" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
-                    if distance < 8 then 
+                    if distance < 20 then 
                         
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                         local bool2 = true 
@@ -105,7 +105,7 @@ local positiontext = function(text,coords,duration,pedrelative)
                     end 
                 elseif positiontext_handles[positiontext_handle]=="hide" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
-                    if distance < 8 then 
+                    if distance < 20 then 
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                         local bool2 = true
                         if pedrelative then bool2 = IsPedHeadingTowardsPosition(PlayerPedId(), coords.x,coords.y,coords.z,90.0) end 
@@ -272,10 +272,10 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     if positionmarker_handle > 65530 then positionmarker_handle = 1 end 
     positionmarker_handle = positionmarker_handle + 1
     local positionmarker_handle = positionmarker_handle
-    Threads.AddPosition("positionmarker"..positionmarker_handle,coords,20.0,function(result)
+    Threads.AddPosition("positionmarker"..positionmarker_handle,coords,25.0,function(result)
         
         if result.action == 'enter' then 
-            print(positionmarker_handle)
+           
             positionmarker_handles[positionmarker_handle] = "hide" 
             Threads.CreateLoopOnce("positionmarker"..positionmarker_handle,0,function(Break)
                 if positionmarker_handles[positionmarker_handle]=="unshow" then 
@@ -286,7 +286,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                     end
                 elseif positionmarker_handles[positionmarker_handle]=="show" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
-                    if distance < 16 then 
+                    if distance < 20 then 
                         
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                         local bool2 = true 
@@ -318,7 +318,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                     end 
                 elseif positionmarker_handles[positionmarker_handle]=="hide" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
-                    if distance < 16 then 
+                    if distance < 20 then 
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                         local bool2 = true
                         if pedrelative then bool2 = IsPedHeadingTowardsPosition(PlayerPedId(), coords.x,coords.y,coords.z,90.0) end 
