@@ -1,39 +1,26 @@
-local DrawText2DAlpha = function(alpha,text,scale,x,y)
-    if alpha > 0 then 
-        scale = scale or 15
-        SetTextScale(scale/24, scale/24)
-        SetTextFont(0)
-        SetTextColour(255, 255, 255, alpha)
-        SetTextDropshadow(0, 0, 0, 0, 255)
-        SetTextDropShadow()
-        SetTextOutline()
-        SetTextCentre(true)
-        BeginTextCommandDisplayText("STRING")
-        AddTextComponentSubstringPlayerName(text)
-        EndTextCommandDisplayText(x, y, 0)
-        --ClearDrawOrigin()
-    end 
-end
-local DrawText3DAlpha = function(alpha,text,coords,scale,x,y)
-    
-    if alpha > 0 then 
+
+local DrawText3DAlpha = function(object)
+    local coords = object._coords
+    if object._alpha > 0 then 
         local camCoords = GetGameplayCamCoords()
         local distance = #(coords - camCoords)
-        local scale = (scale / distance) * 2
+        local scale = (object._scale / distance) * 2
         local fov = (1 / GetGameplayCamFov()) * 100
         scale = scale * fov
         scale = scale or 15
         SetTextScale(scale/24, scale/24)
-        SetTextFont(0)
-        SetTextColour(255, 255, 255, alpha)
+        SetTextFont(object._font or 0)
+        SetTextColour(255, 255, 255, object._alpha)
         SetTextDropshadow(0, 0, 0, 0, 255)
         SetTextDropShadow()
         SetTextOutline()
         SetTextCentre(true)
+        SetDrawOrigin(coords.x,coords.y,coords.z)
         BeginTextCommandDisplayText("STRING")
-        AddTextComponentSubstringPlayerName(text)
-        EndTextCommandDisplayText(x, y, 0)
-        --ClearDrawOrigin()
+        AddTextComponentSubstringPlayerName(object._text)
+        EndTextCommandDisplayText(0.0, 0.0, 0)
+        ClearDrawOrigin()
+        
     end 
 end
 local DrawNextOrder = function(handle)
@@ -41,12 +28,14 @@ local DrawNextOrder = function(handle)
 end 
 local positiontext_handle = 1
 local positiontext_handles = {}
-local positiontext = function(text,coords,duration,pedrelative)
+local positiontext = function(text,coords,duration,pedrelative,font)
     local object = {}
     object._text = text
     object._alpha = 0
     local _scale = 15
     object._scale = _scale
+    object._coords = coords
+    if font then object._font = RegisterFontId(font) end 
     local durationIn,durationHold,durationOut
     if durationIn == nil then durationIn = duration end 
     if durationHold == nil then durationHold = 0 end 
@@ -64,11 +53,11 @@ local positiontext = function(text,coords,duration,pedrelative)
             positiontext_handles[positiontext_handle] = "hide" 
             Threads.CreateLoopOnce("positiontext"..positiontext_handle,0,function(Break)
                 if positiontext_handles[positiontext_handle]=="unshow" then 
-                    DrawNextOrder(positiontext_handle)
+                    
                     local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                     if bool then 
-                        object._x,object._y = xper,yper
-                        DrawText3DAlpha(math.floor(object._alpha),object._text,coords,object._scale,object._x,object._y)
+                        DrawNextOrder(positiontext_handle)
+                        DrawText3DAlpha(object)
                     end
                 elseif positiontext_handles[positiontext_handle]=="show" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
@@ -90,7 +79,7 @@ local positiontext = function(text,coords,duration,pedrelative)
                                 end 
                                 object._x,object._y = xper,yper
                                 DrawNextOrder(positiontext_handle)
-                                DrawText3DAlpha(math.floor(object._alpha),object._text,coords,object._scale,object._x,object._y)
+                                DrawText3DAlpha(object)
                             else 
                                 Threads.TweenCFX.removeTween(object)
                                 object._alpha = 0
@@ -132,8 +121,8 @@ local positiontext = function(text,coords,duration,pedrelative)
     end)
     
 end
-exports('positiontext', function (text,coords,duration,pedrelative)
-    return positiontext(text,coords,duration,pedrelative)
+exports('positiontext', function (text,coords,duration,pedrelative,font)
+    return positiontext(text,coords,duration,pedrelative,font)
 end )
 
 local NormalStyledMarkers = {}
@@ -200,7 +189,6 @@ NormalStyledMarkers["default"] = function(object)
 end 
 
 local DrawMarkerStyledAlpha = function(object)
-    
     return DrawMarker(
         object._type or 0, 
         object._x , 
