@@ -52,6 +52,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         Arrival.pedcoords = GetEntityCoords(Arrival.ped)
         Arrival.pedzone = Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z)
         local zonedatasnew = Arrival.zonedata_full[Arrival.pedzone] 
+        local ks = {}
         for i=1,#zonedatasnew do 
             local v = zonedatasnew[i]
             local pos = vector3(v.x,v.y,v.z)
@@ -80,9 +81,9 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
 
             end 
             local k = distance*15 > 3000 and 3000 or distance*15
-            delay.setter(528+k)
-                
+            table.insert(ks,528+k)
         end 
+        delay.setter(math.min(table.unpack(ks)))
     end)
 end 
 Arrival.AddPosition = function (actionname,data,rangeorcb,_cb)
