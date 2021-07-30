@@ -394,7 +394,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     end)
 end
 exports('positionmarker', function (coords,rotations,duration,pedrelative,isground,stylename,vars)
-    print(coords,rotations,duration,pedrelative,isground,stylename)
+   
     return positionmarker(coords,rotations,duration,pedrelative,isground,stylename,vars)
 end )
 

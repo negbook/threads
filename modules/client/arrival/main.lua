@@ -95,7 +95,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
                                 v.enter = nil 
                                 v.exit = true
                                 if v.arrival then v.arrival(v,'exit') end 
-                                print("exit1")
+                               
                             end 
                             
                         end 
@@ -110,15 +110,15 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         Arrival.pedzone = Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z)
         local zonefull = Arrival.zonedata_full
         local zonedatasnew = zonefull[Arrival.pedzone]
-        print(zonedatasnew,Arrival.pedzone)
+       
         if zonedatasnew and #zonedatasnew>0 then 
             for i=1,#zonedatasnew do 
-                print(i)
+                
                 local v = zonedatasnew[i]
                 local pos = vector3(v.x,v.y,v.z)
                 
                 local distance = #(pos-Arrival.pedcoords)
-                print(v.range)
+                
                 if distance < v.range then
                     if not v.enter then 
                         v.enter = true 
@@ -135,7 +135,7 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
                         v.enter = nil 
                         v.exit = true
                         if v.arrival then v.arrival(v,'exit') end 
-                        print("exit2")
+                       
                     end 
                     
                 end 
