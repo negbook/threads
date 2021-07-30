@@ -863,8 +863,8 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
             Threads.Draws.PositionText = function(text,coords,duration,ispedrelative,font)
                 exports.threads:positiontext(text,coords,duration,ispedrelative,font)
             end 
-            Threads.Draws.PositionMarker = function(coords,rotations,duration,ispedrelative,isground,stylename)
-                exports.threads:positionmarker(coords,rotations,duration,ispedrelative,isground,stylename)
+            Threads.Draws.PositionMarker = function(coords,rotations,duration,ispedrelative,isground,stylename,vars)
+                exports.threads:positionmarker(coords,rotations,duration,ispedrelative,isground,stylename,vars)
             end 
             
         end 

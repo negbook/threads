@@ -188,8 +188,76 @@ NormalStyledMarkers["default"] = function(object)
     object._spin = false
 end 
 
+NormalStyledMarkers["texture"] = function(object)
+    object._type = 8
+    object._float = false
+    object._pointcam = false
+    object._spin = false
+end 
+NormalStyledMarkers["texture_shadow"] = NormalStyledMarkers["texture"]
+
+NormalStyledMarkers["texture_light"] = function(object)
+    object._type = 9
+    object._float = false
+    object._pointcam = false
+    object._spin = false
+end 
 local DrawMarkerStyledAlpha = function(object)
-    return DrawMarker(
+    if object._shadow then 
+        DrawMarker(
+        object._type or 0, 
+        object._x , 
+        object._y , 
+        object._z+object._shadow , 
+        0.0 , 
+        0.0 , 
+        0.0 , 
+        object._xrotation or 0.0, 
+        object._yrotation or 0.0, 
+        object._zrotation or 0.0, 
+        1.1 * (object._xscale or 1.0), 
+        1.1 * (object._yscale or 1.0), 
+        1.0 * (object._zscale or 1.0), 
+        object._r or 255, 
+        object._g or 255, 
+        object._b or 255, 
+        math.floor(object._alpha) or 255, 
+        object._float or false , 
+        object._pointcam or false , 
+        2 , 
+        object._spin or false , 
+        object._texturedict or 0 , 
+        object._texturename or 0, 
+        0
+        )
+        DrawMarker(
+        object._type or 0, 
+        object._x , 
+        object._y , 
+        object._z , 
+        0.0 , 
+        0.0 , 
+        0.0 , 
+        object._xrotation or 0.0, 
+        object._yrotation or 0.0, 
+        object._zrotation or 0.0, 
+        object._xscale or 1.0, 
+        object._yscale or 1.0, 
+        object._zscale or 1.0, 
+        20, 
+        20, 
+        20, 
+        120, 
+        object._float or false , 
+        object._pointcam or false , 
+        2 , 
+        object._spin or false , 
+        object._texturedict or 0 , 
+        object._texturename or 0, 
+        0
+        )
+    else 
+        DrawMarker(
         object._type or 0, 
         object._x , 
         object._y , 
@@ -211,20 +279,25 @@ local DrawMarkerStyledAlpha = function(object)
         object._pointcam or false , 
         2 , 
         object._spin or false , 
-        0 , 
-        0, 
+        object._texturedict or 0 , 
+        object._texturename or 0, 
         0
-    )
+        )
+    end 
+    
+    
 end 
 
 
 
 local positionmarker_handle = 1
 local positionmarker_handles = {}
-local positionmarker = function(coords,rotations,duration,pedrelative,isground,stylename)
+local positionmarker = function(coords,rotations,duration,pedrelative,isground,stylename,vars)
     local object = {}
     stylename = stylename or "default"
-    
+    if vars and vars._texturedict and (stylename~="texture" or stylename ~= "texture_light") then 
+        stylename = "texture"
+    end 
     if isground then 
         local topz = coords.z
         local bottomz = GetHeightmapBottomZForPosition(coords.x,coords.y)
@@ -247,7 +320,11 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     object._xrotation = rotations.x
     object._yrotation = rotations.y
     object._zrotation = rotations.z
-    
+    if vars then 
+        for i,v in pairs(vars) do 
+            object[i] = v
+        end 
+    end 
     object._alpha = 0
     NormalStyledMarkers[stylename:lower()](object)
     local durationIn,durationHold,durationOut
@@ -333,8 +410,8 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     end)
     
 end
-exports('positionmarker', function (coords,rotations,duration,pedrelative,isground,stylename)
-    return positionmarker(coords,rotations,duration,pedrelative,isground,stylename)
+exports('positionmarker', function (coords,rotations,duration,pedrelative,isground,stylename,vars)
+    return positionmarker(coords,rotations,duration,pedrelative,isground,stylename,vars)
 end )
 
 
