@@ -79,7 +79,7 @@ Threads.TweenCFX.delayCall (object, duration, vars) --from something to the end 
 
 
 ## Modules : Arrival  
-Add positions and callback when you arrived that place. recommanded range <=5.0  
+Add positions and callback when you arrived that place. recommanded range <=5.0~10.0  
 Detect if you arrival somewhere positions.It can be a table array or just a position data.  
 When you arrived,callback a data relative to the raw position data.
 
