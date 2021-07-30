@@ -1,4 +1,3 @@
-
 local DrawText3DAlpha = function(object)
     local coords = object._coords
     if object._alpha > 0 then 
@@ -20,7 +19,6 @@ local DrawText3DAlpha = function(object)
         AddTextComponentSubstringPlayerName(object._text)
         EndTextCommandDisplayText(0.0, 0.0, 0)
         ClearDrawOrigin()
-        
     end 
 end
 local DrawNextOrder = function(handle)
@@ -47,13 +45,10 @@ local positiontext = function(text,coords,duration,pedrelative,font)
     positiontext_handle = positiontext_handle + 1
     local positiontext_handle = positiontext_handle
     Threads.AddPosition("positiontext"..positiontext_handle,coords,25.0,function(result)
-        
         if result.action == 'enter' then 
-            
             positiontext_handles[positiontext_handle] = "hide" 
             Threads.CreateLoopOnce("positiontext"..positiontext_handle,0,function(Break)
                 if positiontext_handles[positiontext_handle]=="unshow" then 
-                    
                     local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                     if bool then 
                         DrawNextOrder(positiontext_handle)
@@ -62,7 +57,6 @@ local positiontext = function(text,coords,duration,pedrelative,font)
                 elseif positiontext_handles[positiontext_handle]=="show" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
                     if distance < 20 then 
-                        
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                         local bool2 = true 
                         if pedrelative then bool2 = IsPedHeadingTowardsPosition(PlayerPedId(), coords.x,coords.y,coords.z,90.0) end 
@@ -119,12 +113,10 @@ local positiontext = function(text,coords,duration,pedrelative,font)
             positiontext_handles[positiontext_handle] = "shoudkill"
         end 
     end)
-    
 end
 exports('positiontext', function (text,coords,duration,pedrelative,font)
     return positiontext(text,coords,duration,pedrelative,font)
 end )
-
 local NormalStyledMarkers = {}
 NormalStyledMarkers["door"] = function(object)
     object._type = 0
@@ -141,7 +133,6 @@ end
 NormalStyledMarkers["entrance"] = NormalStyledMarkers["door"]
 NormalStyledMarkers["enter"] = NormalStyledMarkers["door"]
 NormalStyledMarkers["exit"] = NormalStyledMarkers["door"]
-
 NormalStyledMarkers["dollors"] = function(object)
     object._type = 29
     object._float = false
@@ -157,10 +148,7 @@ NormalStyledMarkers["dollors"] = function(object)
 end 
 NormalStyledMarkers["money"] = NormalStyledMarkers["dollors"]
 NormalStyledMarkers["dollor"] = NormalStyledMarkers["dollors"]
-
-
 NormalStyledMarkers["targetpoint"] = function(object)
-    
     object._type = 25
     object._float = false
     object._pointcam = false
@@ -173,8 +161,6 @@ NormalStyledMarkers["targetpoint"] = function(object)
     object._spin = false
 end 
 NormalStyledMarkers["ring"] = NormalStyledMarkers["targetpoint"] 
-
-
 NormalStyledMarkers["default"] = function(object)
     object._type = 1
     object._float = false
@@ -187,7 +173,6 @@ NormalStyledMarkers["default"] = function(object)
     object._b = 0
     object._spin = false
 end 
-
 NormalStyledMarkers["texture"] = function(object)
     object._type = 8
     object._float = false
@@ -195,7 +180,6 @@ NormalStyledMarkers["texture"] = function(object)
     object._spin = false
 end 
 NormalStyledMarkers["texture_shadow"] = NormalStyledMarkers["texture"]
-
 NormalStyledMarkers["texture_light"] = function(object)
     object._type = 9
     object._float = false
@@ -203,7 +187,7 @@ NormalStyledMarkers["texture_light"] = function(object)
     object._spin = false
 end 
 local DrawMarkerStyledAlpha = function(object)
-    
+   
     if object._shadow then 
         DrawMarker(
         object._type or 0, 
@@ -288,12 +272,7 @@ local DrawMarkerStyledAlpha = function(object)
         1
         )
     end 
-    
-    
 end 
-
-
-
 local positionmarker_handle = 1
 local positionmarker_handles = {}
 local positionmarker = function(coords,rotations,duration,pedrelative,isground,stylename,vars)
@@ -306,16 +285,13 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
         local topz = coords.z
         local bottomz = GetHeightmapBottomZForPosition(coords.x,coords.y)
         local steps = (topz-bottomz)/100
-        
         local foundGround
         local height = topz + 0.0
         local groundz
-        
         while not foundGround and height > bottomz  do 
             foundGround, groundz = GetGroundZFor_3dCoord(coords.x,coords.y, height,1 )
             height = height - steps
         end 
-        
         coords = vector3(coords.x,coords.y,groundz)
     end 
     object._x = coords.x 
@@ -324,11 +300,8 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     object._xrotation = rotations.x
     object._yrotation = rotations.y
     object._zrotation = rotations.z
-    
-    
     if vars then 
         for i,v in pairs(vars) do 
-            
             object[i] = v
         end 
     end 
@@ -345,9 +318,7 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
     positionmarker_handle = positionmarker_handle + 1
     local positionmarker_handle = positionmarker_handle
     Threads.AddPosition("positionmarker"..positionmarker_handle,coords,25.0,function(result)
-        
         if result.action == 'enter' then 
-           
             positionmarker_handles[positionmarker_handle] = "hide" 
             Threads.CreateLoopOnce("positionmarker"..positionmarker_handle,0,function(Break)
                 if positionmarker_handles[positionmarker_handle]=="unshow" then 
@@ -359,7 +330,6 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                 elseif positionmarker_handles[positionmarker_handle]=="show" then 
                     local distance = #(GetEntityCoords(PlayerPedId()) - coords)
                     if distance < 20 then 
-                        
                         local bool,xper,yper = GetScreenCoordFromWorldCoord(coords.x,coords.y,coords.z)
                         local bool2 = true 
                         if pedrelative then bool2 = IsPedHeadingTowardsPosition(PlayerPedId(), coords.x,coords.y,coords.z,90.0) end 
@@ -411,14 +381,14 @@ local positionmarker = function(coords,rotations,duration,pedrelative,isground,s
                     Break()
                 end 
             end )
-        elseif result.action == 'exit' then 
+        end 
+        if result.action == 'exit' then 
             positionmarker_handles[positionmarker_handle] = "shoudkill"
+            
         end 
     end)
-    
 end
 exports('positionmarker', function (coords,rotations,duration,pedrelative,isground,stylename,vars)
     return positionmarker(coords,rotations,duration,pedrelative,isground,stylename,vars)
 end )
-
 
