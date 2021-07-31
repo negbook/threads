@@ -53,35 +53,37 @@ Arrival.AddPositions = function (actionname,datas,rangeorcb,_cb)
         Arrival.pedzone = Arrival.GetHashMethod(Arrival.pedcoords.x,Arrival.pedcoords.y,Arrival.pedcoords.z)
         local zonedatasnew = Arrival.zonedata_full[Arrival.pedzone] 
         local ks = {}
-        for i=1,#zonedatasnew do 
-            local v = zonedatasnew[i]
-            local pos = vector3(v.x,v.y,v.z)
-            local distance = #(pos-Arrival.pedcoords)
-            if distance < v.range then
-                if not v.enter then 
-                    v.enter = true 
-                    local newv = v
-                    Threads.CreateLoop("lockv"..tostring(newv),528,function(Break2)
-                        local pos = vector3(newv.x,newv.y,newv.z)
-                        local distance = #(pos-Arrival.pedcoords)
-                        if distance >= newv.range then
-                            if newv.enter~=nil  and newv.enter == true then 
-                                newv.enter = nil 
-                                newv.exit = true
-                                if newv.arrival then newv.arrival(newv,'exit') end 
-                                Break2()
+        if zonedatasnew and #zonedatasnew > 0 then 
+            for i=1,#zonedatasnew do 
+                local v = zonedatasnew[i]
+                local pos = vector3(v.x,v.y,v.z)
+                local distance = #(pos-Arrival.pedcoords)
+                if distance < v.range then
+                    if not v.enter then 
+                        v.enter = true 
+                        local newv = v
+                        Threads.CreateLoop("lockv"..tostring(newv),528,function(Break2)
+                            local pos = vector3(newv.x,newv.y,newv.z)
+                            local distance = #(pos-Arrival.pedcoords)
+                            if distance >= newv.range then
+                                if newv.enter~=nil  and newv.enter == true then 
+                                    newv.enter = nil 
+                                    newv.exit = true
+                                    if newv.arrival then newv.arrival(newv,'exit') end 
+                                    Break2()
+                                end 
                             end 
-                        end 
-                    end)
-                    if v.arrival then v.arrival(v,'enter') end 
-                end 
-                if v.exit~=nil and v.exit == true then 
-                    v.exit = nil 
-                end  
+                        end)
+                        if v.arrival then v.arrival(v,'enter') end 
+                    end 
+                    if v.exit~=nil and v.exit == true then 
+                        v.exit = nil 
+                    end  
 
+                end 
+                --local k = distance*15 > 3000 and 3000 or distance*15
+                --table.insert(ks,528+k)
             end 
-            --local k = distance*15 > 3000 and 3000 or distance*15
-            --table.insert(ks,528+k)
         end 
         --delay.setter(math.min(table.unpack(ks)))
     end)
