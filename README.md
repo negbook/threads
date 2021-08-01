@@ -1,5 +1,6 @@
 # fxserver-threads
-Threads utilities for FXServer
+Threads utilities for FXServer  
+Threads utilities is a minority lib that makes scripts huge optimatize .
 
 # INSTALLATION
 
