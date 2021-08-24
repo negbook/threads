@@ -50,6 +50,7 @@ Threads.CreateLoopCustom
 Threads.CreateLoopOnceCustom
 Threads.SetLoopCustom
 Threads.GetLoopCustom
+threads.CreateThreadOnce
 ```
 ### EXAMPLE
 ```
@@ -76,6 +77,9 @@ Threads.CreateLoopCustom("CheckCustomGetSet",3000,function(delay,Break,name,tota
     print("get:"..name,total,delay.getter())
     delay.setter(100)
     print("get:"..name,total,delay.getter())
+end)
+Threads.CreateThreadOnce("just one",function()
+	print(123)
 end)
 
 ```
