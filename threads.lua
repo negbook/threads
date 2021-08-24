@@ -232,7 +232,13 @@ threads.CreateThreadOnce = function(name,fn)
         return 
     end 
     threads.OnceThread[name] = true
-    CreateThread(fn)
+	if fn and type(fn) == 'function' or fn.__cfx_functionReference then 
+		CreateThread(function()
+			fn()
+		end)
+	else 
+		error("CreateThreadOnce",2)
+	end 
 end 
 threads.ClearThreadOnce = function(name)
     threads.OnceThread[name] = nil 
