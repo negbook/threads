@@ -227,11 +227,11 @@ CreateThread(function()
 end)
 end 
 threads.OnceThread = {}
-threads.CreateThreadOnce = function(fn)
-    if threads.OnceThread[tostring(fn)] then 
+threads.CreateThreadOnce = function(name,fn)
+    if threads.OnceThread[name] then 
         return 
     end 
-    threads.OnceThread[tostring(fn)] = true
+    threads.OnceThread[name] = true
     CreateThread(fn)
 end 
 threads.ClearThreadOnce = function(name)
