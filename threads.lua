@@ -442,272 +442,278 @@ threads.BreakCustom = function(name)
     if threads.IsActionOfLoopAliveCustom(name) then threads.KillActionOfLoopCustom(name) end 
 end 
 if threads.Modules.Tween then 
---Tween:
-local TweenCFX = {}
-function TweenCFX:TweenRef(_Thread,_props,_vars)
-   self.Thread = _Thread;
-   self.props = _props;
-   self.vars = _vars;
-   return self
-end
-    local Back = {}
-        Back.easeIn = function (t, b, c, d, s)
-           if not s then 
-              s = 1.70158;
-           end
-           t = t / d
-           return c * (t) * t * ((s + 1) * t - s) + b;
-        end 
-        Back.easeOut = function (t, b, c, d, s)
-           if not s then 
-              s = 1.70158;
-           end 
-           t = t / d - 1
-           return c * ((t) * t * ((s + 1) * t + s) + 1) + b;
-        end
-        Back.easeInOut = function (t, b, c, d, s)
-           if not s then 
-              s = 1.70158;
-           end 
-           t = t / (d * 0.5)
-           if t < 1 then 
-              s = s * 1.525
-              return c * 0.5 * (t * t * (((s) + 1) * t - s)) + b;
-           end 
-           t = t - 2
-           s = s * 1.525
-           return c * 0.5 * ((t) * t * (((s) + 1) * t + s) + 2) + b;
-        end
-    local Circ = {}
-        Circ.easeIn = function (t, b, c, d)
-           t = t / d
-           return (- c) * (math.sqrt(1 - (t) * t) - 1) + b;
-        end
-        Circ.easeOut = function (t, b, c, d)
-           t = t / d - 1
-           return c * math.sqrt(1 - (t) * t) + b;
-        end
-        Circ.easeInOut = function (t, b, c, d)
-           t = t / (d / 2)
-           if((t) < 1) then 
-              return (- c) / 2 * (math.sqrt(1 - t * t) - 1) + b;
-           end
-           t = t - 2
-           return c / 2 * (math.sqrt(1 - (t) * t) + 1) + b;
-        end
-    local Cubic = {}
-        Cubic.easeIn = function (t, b, c, d)
-           t = t / d
-           return c * (t) * t * t + b;
-        end 
-        Cubic.easeOut = function (t, b, c, d)
-           t = t / d - 1
-           return c * ((t) * t * t + 1) + b;
-        end
-        Cubic.easeInOut = function (t, b, c, d)
-           t = t / (d / 2)
-           if((t) < 1) then
-              return c / 2 * t * t * t + b;
-           end
-           t = t - 2
-           return c / 2 * ((t) * t * t + 2) + b;
-        end
-    local Linear = {}
-        Linear._temp_ = function (t, b, c, d)
-           return c * t / d + b;
-        end 
-        Linear.easeNone = Linear._temp_
-        Linear.easeIn = Linear._temp_
-        Linear.easeOut = Linear._temp_
-        Linear.easeInOut = Linear._temp_
-    local Quad = {}
-       Quad.easeIn = function (t, b, c, d)
-          t = t / d
-          return c * (t) * t + b;
-       end
-       Quad.easeOut = function (t, b, c, d)
-          t = t / d
-          return (- c) * (t) * (t - 2) + b;
-       end
-       Quad.easeInOut = function (t, b, c, d)
-          t = t / (d / 2)
-          if((t) < 1) then 
-             return c / 2 * t * t + b;
-          end
-          t = t - 1
-          return (- c) / 2 * ((t) * (t - 2) - 1) + b;
-       end
-    local Quart = {}
-       Quart.easeIn = function (t, b, c, d)
-          t = t / d
-          return c * (t) * t * t * t + b;
-       end
-       Quart.easeOut = function (t, b, c, d)
-          t = t / d - 1
-          return (- c) * ((t) * t * t * t - 1) + b;
-       end
-       Quart.easeInOut = function (t, b, c, d)
-          t = t / (d / 2)
-          if((t) < 1) then 
-             return c / 2 * t * t * t * t + b;
-          end
-          t = t - 2
-          return (- c) / 2 * ((t) * t * t * t - 2) + b;
-       end
-    local Sine = {}
-       Sine.easeIn = function (t, b, c, d)
-          return (- c) * math.cos(t / d * 1.5707963267948966) + c + b;
-       end
-       Sine.easeOut = function (t, b, c, d)
-          return c * math.sin(t / d * 1.5707963267948966) + b;
-       end
-       Sine.easeInOut = function (t, b, c, d)
-          return (- c) / 2 * (math.cos(3.141592653589793 * t / d) - 1) + b;
-       end
-    TweenCFX.Ease = {}
-       TweenCFX.Ease.Linear = 1
-       TweenCFX.Ease.QuadraticIn = 2
-       TweenCFX.Ease.QuadraticOut = 3
-       TweenCFX.Ease.QuadraticInout = 4
-       TweenCFX.Ease.CubicIn = 5
-       TweenCFX.Ease.CubicOut = 6
-       TweenCFX.Ease.CubicInout = 7
-       TweenCFX.Ease.QuarticIn = 8
-       TweenCFX.Ease.QuarticOut = 9
-       TweenCFX.Ease.QuarticInout = 10
-       TweenCFX.Ease.SineIn = 11;
-       TweenCFX.Ease.SineOut = 12
-       TweenCFX.Ease.SineInout = 13
-       TweenCFX.Ease.BackIn = 14
-       TweenCFX.Ease.BackOut = 15
-       TweenCFX.Ease.BackInout = 16
-       TweenCFX.Ease.CircularIn = 17
-       TweenCFX.Ease.CircularOut = 18
-       TweenCFX.Ease.CircularInout = 19
-       TweenCFX.Ease.EaseTable = {
-           Linear.easeNone,
-           Quad.easeIn,
-           Quad.easeOut,
-           Quad.easeInOut,
-           Cubic.easeIn,
-           Cubic.easeOut,
-           Cubic.easeInOut,
-           Quart.easeIn,
-           Quart.easeOut,
-           Quart.easeInOut,
-           Sine.easeIn,
-           Sine.easeOut,
-           Sine.easeInOut,
-           Back.easeIn,
-           Back.easeOut,
-           Back.easeInOut,
-           Circ.easeIn,
-           Circ.easeOut,
-           Circ.easeInOut
-       };
-    TweenCFX.Tween = {}
+	--Tween:
+	local TweenCFX = {}
+	function TweenCFX:TweenRef(_Thread, _props, _vars)
+		self.Thread = _Thread
+		self.props = _props
+		self.vars = _vars
+		return self
+	end
+	local Back = {}
+	Back.easeIn = function(t, b, c, d, s)
+		if not s then
+			s = 1.70158
+		end
+		t = t / d
+		return c * (t) * t * ((s + 1) * t - s) + b
+	end
+	Back.easeOut = function(t, b, c, d, s)
+		if not s then
+			s = 1.70158
+		end
+		t = t / d - 1
+		return c * ((t) * t * ((s + 1) * t + s) + 1) + b
+	end
+	Back.easeInOut = function(t, b, c, d, s)
+		if not s then
+			s = 1.70158
+		end
+		t = t / (d * 0.5)
+		if t < 1 then
+			s = s * 1.525
+			return c * 0.5 * (t * t * (((s) + 1) * t - s)) + b
+		end
+		t = t - 2
+		s = s * 1.525
+		return c * 0.5 * ((t) * t * (((s) + 1) * t + s) + 2) + b
+	end
+	local Circ = {}
+	Circ.easeIn = function(t, b, c, d)
+		t = t / d
+		return (-c) * (math.sqrt(1 - (t) * t) - 1) + b
+	end
+	Circ.easeOut = function(t, b, c, d)
+		t = t / d - 1
+		return c * math.sqrt(1 - (t) * t) + b
+	end
+	Circ.easeInOut = function(t, b, c, d)
+		t = t / (d / 2)
+		if ((t) < 1) then
+			return (-c) / 2 * (math.sqrt(1 - t * t) - 1) + b
+		end
+		t = t - 2
+		return c / 2 * (math.sqrt(1 - (t) * t) + 1) + b
+	end
+	local Cubic = {}
+	Cubic.easeIn = function(t, b, c, d)
+		t = t / d
+		return c * (t) * t * t + b
+	end
+	Cubic.easeOut = function(t, b, c, d)
+		t = t / d - 1
+		return c * ((t) * t * t + 1) + b
+	end
+	Cubic.easeInOut = function(t, b, c, d)
+		t = t / (d / 2)
+		if ((t) < 1) then
+			return c / 2 * t * t * t + b
+		end
+		t = t - 2
+		return c / 2 * ((t) * t * t + 2) + b
+	end
+	local Linear = {}
+	Linear._temp_ = function(t, b, c, d)
+		return c * t / d + b
+	end
+	Linear.easeNone = Linear._temp_
+	Linear.easeIn = Linear._temp_
+	Linear.easeOut = Linear._temp_
+	Linear.easeInOut = Linear._temp_
+	local Quad = {}
+	Quad.easeIn = function(t, b, c, d)
+		t = t / d
+		return c * (t) * t + b
+	end
+	Quad.easeOut = function(t, b, c, d)
+		t = t / d
+		return (-c) * (t) * (t - 2) + b
+	end
+	Quad.easeInOut = function(t, b, c, d)
+		t = t / (d / 2)
+		if ((t) < 1) then
+			return c / 2 * t * t + b
+		end
+		t = t - 1
+		return (-c) / 2 * ((t) * (t - 2) - 1) + b
+	end
+	local Quart = {}
+	Quart.easeIn = function(t, b, c, d)
+		t = t / d
+		return c * (t) * t * t * t + b
+	end
+	Quart.easeOut = function(t, b, c, d)
+		t = t / d - 1
+		return (-c) * ((t) * t * t * t - 1) + b
+	end
+	Quart.easeInOut = function(t, b, c, d)
+		t = t / (d / 2)
+		if ((t) < 1) then
+			return c / 2 * t * t * t * t + b
+		end
+		t = t - 2
+		return (-c) / 2 * ((t) * t * t * t - 2) + b
+	end
+	local Sine = {}
+	Sine.easeIn = function(t, b, c, d)
+		return (-c) * math.cos(t / d * 1.5707963267948966) + c + b
+	end
+	Sine.easeOut = function(t, b, c, d)
+		return c * math.sin(t / d * 1.5707963267948966) + b
+	end
+	Sine.easeInOut = function(t, b, c, d)
+		return (-c) / 2 * (math.cos(3.141592653589793 * t / d) - 1) + b
+	end
+	TweenCFX.Ease = {}
+	TweenCFX.Ease.Linear = 1
+	TweenCFX.Ease.QuadraticIn = 2
+	TweenCFX.Ease.QuadraticOut = 3
+	TweenCFX.Ease.QuadraticInout = 4
+	TweenCFX.Ease.CubicIn = 5
+	TweenCFX.Ease.CubicOut = 6
+	TweenCFX.Ease.CubicInout = 7
+	TweenCFX.Ease.QuarticIn = 8
+	TweenCFX.Ease.QuarticOut = 9
+	TweenCFX.Ease.QuarticInout = 10
+	TweenCFX.Ease.SineIn = 11
+	TweenCFX.Ease.SineOut = 12
+	TweenCFX.Ease.SineInout = 13
+	TweenCFX.Ease.BackIn = 14
+	TweenCFX.Ease.BackOut = 15
+	TweenCFX.Ease.BackInout = 16
+	TweenCFX.Ease.CircularIn = 17
+	TweenCFX.Ease.CircularOut = 18
+	TweenCFX.Ease.CircularInout = 19
+	TweenCFX.Ease.EaseTable = {
+		Linear.easeNone,
+		Quad.easeIn,
+		Quad.easeOut,
+		Quad.easeInOut,
+		Cubic.easeIn,
+		Cubic.easeOut,
+		Cubic.easeInOut,
+		Quart.easeIn,
+		Quart.easeOut,
+		Quart.easeInOut,
+		Sine.easeIn,
+		Sine.easeOut,
+		Sine.easeInOut,
+		Back.easeIn,
+		Back.easeOut,
+		Back.easeInOut,
+		Circ.easeIn,
+		Circ.easeOut,
+		Circ.easeInOut
+	}
+	TweenCFX.Tween = {}
 	function TweenCFX.Tween:New(_sourceobject, _duration, _vars, _isATween)
-		local this = setmetatable({},{__index=self})
-		print(self)
-		this.object = _sourceobject;
-		this.vars = _vars;
-		this.duration = _duration * 1000;
-		this.startTime = GetGameTimer() + (this.vars.delay and this.vars.delay * 1000 or 0);
-		this.ease = TweenCFX.Ease.EaseTable[TweenCFX.Ease.Linear];
-		this.props = {};
-		if _isATween then 
-		  for abbr,v in pairs (this.vars) do
-			 if abbr and type(this.object[abbr]) == 'number' and abbr~="ease" and abbr~="delay" then 
-				table.insert(this.props,{abbr,this.object[abbr],this.vars[abbr]});
-			 end
-		  end
-		  if this.vars.ease then 
-			 if(type(this.vars.ease) == "number") then 
-				this.ease = TweenCFX.Ease.EaseTable[this.vars.ease];
-			 end
-		  end
+		local this = setmetatable({}, {__index = self})
+		this.object = _sourceobject
+		this.vars = _vars
+		this.duration = _duration * 1000
+		this.startTime = GetGameTimer() + (this.vars.delay and this.vars.delay * 1000 or 0)
+		this.ease = TweenCFX.Ease.EaseTable[TweenCFX.Ease.Linear]
+		this.props = {}
+		if _isATween then
+			for abbr, v in pairs(this.vars) do
+				if abbr and type(this.object[abbr]) == "number" and abbr ~= "ease" and abbr ~= "delay" then
+					table.insert(this.props, {abbr, this.object[abbr], this.vars[abbr]})
+				end
+			end
+			if this.vars.ease then
+				if (type(this.vars.ease) == "number") then
+					this.ease = TweenCFX.Ease.EaseTable[this.vars.ease]
+				end
+			end
 		end
 		this.Thread = {}
 		this.Thread.removeThread = function()
-		  if this.Thread.threadid then 
-			threads.KillHandleOfLoop(this.Thread.threadid);
-			this.Thread.threadid = nil
-		  end
-		end 
-		this.Thread.tweenUpdateRef = this;
-		this.Thread.onUpdate = function(this)
-		  TweenCFX.Tween.updateAll(this);
+			if this.Thread.threadid then
+				threads.KillHandleOfLoop(this.Thread.threadid)
+				this.Thread.threadid = nil
+			end
 		end
-		
-		if not TweenCFX.tweenDepth or TweenCFX.tweenDepth > 65530 then TweenCFX.tweenDepth = 1 end 
-		TweenCFX.tweenDepth =  TweenCFX.tweenDepth + 1
-		this.object.TweenRef = TweenCFX:TweenRef(this.Thread,this.props,this.vars);
-		this.Thread.threadid = threads.CreateLoopOnce("TSLContainerThread"..TweenCFX.tweenDepth,0,function()
-			if this.Thread.onUpdate then 
-				this.Thread.onUpdate(this.Thread.tweenUpdateRef )
-			end 
-		end );
+		this.Thread.tweenUpdateRef = this
+		this.Thread.onUpdate = function(this)
+			TweenCFX.Tween.updateAll(this)
+		end
+
+		if not TweenCFX.tweenDepth or TweenCFX.tweenDepth > 65530 then
+			TweenCFX.tweenDepth = 1
+		end
+		TweenCFX.tweenDepth = TweenCFX.tweenDepth + 1
+		this.object.TweenRef = TweenCFX:TweenRef(this.Thread, this.props, this.vars)
+		this.Thread.threadid =
+			threads.CreateLoopOnce(
+			"TSLContainerThread" .. TweenCFX.tweenDepth,
+			0,
+			function()
+				if this.Thread.onUpdate then
+					this.Thread.onUpdate(this.Thread.tweenUpdateRef)
+				end
+			end
+		)
 		return this
 	end
-    TweenCFX.Tween.updateAll = function(this)
-           local timeDiff = GetGameTimer() - this.startTime;
-           local timeProgressing = timeDiff / this.duration;
-           timeProgressing = math.min(timeProgressing,1);
-           for i=1,#this.props  do
-              if timeProgressing > 0 then 
-                if this.props[i] and this.props[i][1] and this.props[i][2] and this.props[i][3] then 
-                    this.object[this.props[i][1]] = this.ease(timeProgressing,this.props[i][2],this.props[i][3] - this.props[i][2],1);--t,b,c,d
-                end 
-              end 
-           end
-           if(timeProgressing == 1) then 
-              for i=1,#this.props  do
-                 this.object[this.props[i][1]] = this.props[i][3];
-              end
-              this.Thread.onUpdate = nil;
-              this.Thread.removeThread();
-              if this.vars.onCompleteScope then 
-                 this.vars.onCompleteScope(table.unpack(this.vars.onCompleteArgs));
-              end
-              return false;
-           end
-        end
-        TweenCFX.Tween.removeTween = function(object)
-           local obj = object.TweenRef;
-           if obj and obj.Thread then 
-              obj.Thread.onUpdate = nil;
-              obj.Thread.removeThread();
-           end
-        end
-        TweenCFX.Tween.endTween = function(object, forceComplete)
-           local obj = object.TweenRef;
-           if obj then
-              for i=1,#obj.props  do
-                 local info = obj.props[i]
-                 object[obj.props[info][0]] = obj.props[info][2];
-              end
-              if(obj.vars.onCompleteScope and forceComplete) then 
-                 obj.vars.onCompleteScope(table.unpack(obj.vars.onCompleteArgs));
-              end
-              obj.Thread.onUpdate = nil;
-              obj.Thread.removeThread();
-           end
-        end
-        TweenCFX.Tween.to = function(object, duration, vars)
-			
-           TweenCFX.Tween.removeTween(object);
-           local newObj = TweenCFX.Tween:New(object,duration,vars,true);
-           return newObj;
-        end
-        TweenCFX.Tween.delayCall = function(object, duration, vars)
-           TweenCFX.Tween.removeTween(object);
-           local newObj = TweenCFX.Tween:New(object,duration,vars,false);
-           return newObj;
-        end 
-		
-        
-threads.TweenCFX = TweenCFX.Tween
-threads.TweenCFX.Ease = TweenCFX.Ease
+	TweenCFX.Tween.updateAll = function(this)
+		local timeDiff = GetGameTimer() - this.startTime
+		local timeProgressing = timeDiff / this.duration
+		timeProgressing = math.min(timeProgressing, 1)
+		for i = 1, #this.props do
+			if timeProgressing > 0 then
+				if this.props[i] and this.props[i][1] and this.props[i][2] and this.props[i][3] then
+					this.object[this.props[i][1]] =
+						this.ease(timeProgressing, this.props[i][2], this.props[i][3] - this.props[i][2], 1) --t,b,c,d
+				end
+			end
+		end
+		if (timeProgressing == 1) then
+			for i = 1, #this.props do
+				this.object[this.props[i][1]] = this.props[i][3]
+			end
+			this.Thread.onUpdate = nil
+			this.Thread.removeThread()
+			if this.vars.onCompleteScope then
+				this.vars.onCompleteScope(table.unpack(this.vars.onCompleteArgs))
+			end
+			return false
+		end
+	end
+	TweenCFX.Tween.removeTween = function(object)
+		local obj = object.TweenRef
+		if obj and obj.Thread then
+			obj.Thread.onUpdate = nil
+			obj.Thread.removeThread()
+		end
+	end
+	TweenCFX.Tween.endTween = function(object, forceComplete)
+		local obj = object.TweenRef
+		if obj then
+			for i = 1, #obj.props do
+				local info = obj.props[i]
+				object[obj.props[info][0]] = obj.props[info][2]
+			end
+			if (obj.vars.onCompleteScope and forceComplete) then
+				obj.vars.onCompleteScope(table.unpack(obj.vars.onCompleteArgs))
+			end
+			obj.Thread.onUpdate = nil
+			obj.Thread.removeThread()
+		end
+	end
+	TweenCFX.Tween.to = function(object, duration, vars)
+		TweenCFX.Tween.removeTween(object)
+		local newObj = TweenCFX.Tween:New(object, duration, vars, true)
+		return newObj
+	end
+	TweenCFX.Tween.delayCall = function(object, duration, vars)
+		TweenCFX.Tween.removeTween(object)
+		local newObj = TweenCFX.Tween:New(object, duration, vars, false)
+		return newObj
+	end
+
+	threads.TweenCFX = TweenCFX.Tween
+	threads.TweenCFX.Ease = TweenCFX.Ease
+
 end 
 
 DrawText2D = function(text,x,y,alpha)
