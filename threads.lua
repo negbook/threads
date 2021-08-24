@@ -45,7 +45,7 @@ local LoopItCustom = function(_name,_timer,_func,_varname)
         local vt = timer
 		table.insert(threads.Custom_ActionTables[timer] , name)
 		CreateThread(function() 
-			while true do
+			local loop;loop = function()
                 if #actiontable == 0 then 
                     return 
                 end 
@@ -72,8 +72,9 @@ local LoopItCustom = function(_name,_timer,_func,_varname)
                 if _varname and threads.Custom_VarTimer[_varname] then 
                     vt = threads.Custom_VarTimer[_varname]
                 end 
-                Wait(vt>0 and vt or 0)
+                SetTimeout(vt>0 and vt or 0,loop)
             end 
+			loop()
             return 
 		end)
 	end 
@@ -316,7 +317,7 @@ local LoopIt = function(_name,_timer,_func)
         local vt = timer
 		table.insert(threads.ActionTables[timer] , name)
 		CreateThread(function() 
-			while true do
+			local loop;loop = function()
                 if #actiontable == 0 then 
                     return 
                 end 
@@ -338,8 +339,9 @@ local LoopIt = function(_name,_timer,_func)
                     end 
                     this()
 				end 
-                Wait(vt)
+                SetTimeout(vt,loop)
             end 
+			loop()
             return 
 		end)
 	end 
@@ -442,6 +444,12 @@ end
 if threads.Modules.Tween then 
 --Tween:
 local TweenCFX = {}
+function TweenCFX:TweenRef(_Thread,_props,_vars)
+   self.Thread = _Thread;
+   self.props = _props;
+   self.vars = _vars;
+   return self
+end
     local Back = {}
         Back.easeIn = function (t, b, c, d, s)
            if not s then 
@@ -597,8 +605,51 @@ local TweenCFX = {}
            Circ.easeOut,
            Circ.easeInOut
        };
-    TweenCFX.Tween = setmetatable({
-        updateAll = function(this)
+    TweenCFX.Tween = {}
+	function TweenCFX.Tween:New(_sourceobject, _duration, _vars, _isATween)
+		local this = setmetatable({},{__index=self})
+		print(self)
+		this.object = _sourceobject;
+		this.vars = _vars;
+		this.duration = _duration * 1000;
+		this.startTime = GetGameTimer() + (this.vars.delay and this.vars.delay * 1000 or 0);
+		this.ease = TweenCFX.Ease.EaseTable[TweenCFX.Ease.Linear];
+		this.props = {};
+		if _isATween then 
+		  for abbr,v in pairs (this.vars) do
+			 if abbr and type(this.object[abbr]) == 'number' and abbr~="ease" and abbr~="delay" then 
+				table.insert(this.props,{abbr,this.object[abbr],this.vars[abbr]});
+			 end
+		  end
+		  if this.vars.ease then 
+			 if(type(this.vars.ease) == "number") then 
+				this.ease = TweenCFX.Ease.EaseTable[this.vars.ease];
+			 end
+		  end
+		end
+		this.Thread = {}
+		this.Thread.removeThread = function()
+		  if this.Thread.threadid then 
+			threads.KillHandleOfLoop(this.Thread.threadid);
+			this.Thread.threadid = nil
+		  end
+		end 
+		this.Thread.tweenUpdateRef = this;
+		this.Thread.onUpdate = function(this)
+		  TweenCFX.Tween.updateAll(this);
+		end
+		
+		if not TweenCFX.tweenDepth or TweenCFX.tweenDepth > 65530 then TweenCFX.tweenDepth = 1 end 
+		TweenCFX.tweenDepth =  TweenCFX.tweenDepth + 1
+		this.object.TweenRef = TweenCFX:TweenRef(this.Thread,this.props,this.vars);
+		this.Thread.threadid = threads.CreateLoopOnce("TSLContainerThread"..TweenCFX.tweenDepth,0,function()
+			if this.Thread.onUpdate then 
+				this.Thread.onUpdate(this.Thread.tweenUpdateRef )
+			end 
+		end );
+		return this
+	end
+    TweenCFX.Tween.updateAll = function(this)
            local timeDiff = GetGameTimer() - this.startTime;
            local timeProgressing = timeDiff / this.duration;
            timeProgressing = math.min(timeProgressing,1);
@@ -620,15 +671,15 @@ local TweenCFX = {}
               end
               return false;
            end
-        end,
-        removeTween = function(object)
+        end
+        TweenCFX.Tween.removeTween = function(object)
            local obj = object.TweenRef;
            if obj and obj.Thread then 
               obj.Thread.onUpdate = nil;
               obj.Thread.removeThread();
            end
-        end,
-        endTween = function(object, forceComplete)
+        end
+        TweenCFX.Tween.endTween = function(object, forceComplete)
            local obj = object.TweenRef;
            if obj then
               for i=1,#obj.props  do
@@ -641,70 +692,74 @@ local TweenCFX = {}
               obj.Thread.onUpdate = nil;
               obj.Thread.removeThread();
            end
-        end,
-        to = function(object, duration, vars)
+        end
+        TweenCFX.Tween.to = function(object, duration, vars)
+			
            TweenCFX.Tween.removeTween(object);
-           local newObj = TweenCFX.Tween(object,duration,vars,true);
+           local newObj = TweenCFX.Tween:New(object,duration,vars,true);
            return newObj;
-        end,
-        delayCall = function(object, duration, vars)
+        end
+        TweenCFX.Tween.delayCall = function(object, duration, vars)
            TweenCFX.Tween.removeTween(object);
-           local newObj = TweenCFX.Tween(object,duration,vars,false);
+           local newObj = TweenCFX.Tween:New(object,duration,vars,false);
            return newObj;
         end 
-        },{__call=function(super,_sourceobject, _duration, _vars, _isATween)
-       local this = {}
-       setmetatable(this,{__index = super})
-       this.object = _sourceobject;
-       this.vars = _vars;
-       this.duration = _duration * 1000;
-       this.startTime = GetGameTimer() + (this.vars.delay and this.vars.delay * 1000 or 0);
-       this.ease = TweenCFX.Ease.EaseTable[TweenCFX.Ease.Linear];
-       this.props = {};
-       if _isATween then 
-          for abbr,v in pairs (this.vars) do
-             if abbr and type(this.object[abbr]) == 'number' and abbr~="ease" and abbr~="delay" then 
-                table.insert(this.props,{abbr,this.object[abbr],this.vars[abbr]});
-             end
-          end
-          if this.vars.ease then 
-             if(type(this.vars.ease) == "number") then 
-                this.ease = TweenCFX.Ease.EaseTable[this.vars.ease];
-             end
-          end
-       end
-       this.Thread = {}
-       this.Thread.removeThread = function()
-          if this.Thread.threadid then 
-            threads.KillHandleOfLoop(this.Thread.threadid);
-            this.Thread.threadid = nil
-          end
-       end 
-       this.Thread.tweenUpdateRef = this;
-       this.Thread.onUpdate = function(this)
-          TweenCFX.Tween.updateAll(this);
-       end
-       TweenCFX.TweenRef = setmetatable({},{__call=function(super,_Thread, _props, _vars)
-           local this = {}
-           setmetatable(this,{__index = super})
-           this.Thread = _Thread;
-           this.props = _props;
-           this.vars = _vars;
-           return this
-       end })
-       if not TweenCFX.tweenDepth or TweenCFX.tweenDepth > 65530 then TweenCFX.tweenDepth = 1 end 
-       TweenCFX.tweenDepth =  TweenCFX.tweenDepth + 1
-       this.object.TweenRef = TweenCFX.TweenRef(this.Thread,this.props,this.vars);
-       this.Thread.threadid = threads.CreateLoopOnce("TSLContainerThread"..TweenCFX.tweenDepth,0,function()
-            if this.Thread.onUpdate then 
-                this.Thread.onUpdate(this.Thread.tweenUpdateRef )
-            end 
-       end );
-       return this
-    end })
+		
+        
 threads.TweenCFX = TweenCFX.Tween
 threads.TweenCFX.Ease = TweenCFX.Ease
 end 
+
+DrawText2D = function(text,x,y,alpha)
+	SetTextScale(0.5, 0.5)
+	SetTextFont(1)
+	SetTextColour(255, 255, 255, alpha)
+	SetTextDropshadow(0, 0, 0, 0, 255)
+	SetTextDropShadow()
+	SetTextOutline()
+	SetTextCentre(true)
+	BeginTextCommandDisplayText('STRING')
+	AddTextComponentSubstringPlayerName(text)
+	EndTextCommandDisplayText(x, y)
+	ClearDrawOrigin()
+end
+local testDrawWhile = nil 
+local testDrawWhile2 = nil 
+function OnDrawFinish(text)
+    print(text.." draw finish!")
+    testDrawWhile = nil
+end 
+function OnDrawFinish2(obj,state)
+    if state == 2 then 
+    print(obj._text.." draw finish!")
+    testDrawWhile2 = nil
+    else 
+    threads.TweenCFX.to(obj,3.0,{_alpha=0.0,ease=threads.TweenCFX.Ease.EaseTable[1],onCompleteScope=OnDrawFinish2,onCompleteArgs={obj,2}})
+    end 
+end 
+CreateThread(function()
+    local object = {}
+    object._text = "haha"
+    object._x = 0.5
+    object._y = 0.0
+    object._alpha = 0
+    threads.TweenCFX.to(object,3.0,{_y=0.5,_alpha=255,delay=1,ease=threads.TweenCFX.Ease.LinearNone,onCompleteScope=OnDrawFinish,onCompleteArgs={object._text}})
+    local object2 = {}
+    object2._text = "haha2"
+    object2._x = 0.0
+    object2._y = 0.5
+    object2._alpha = 255
+    threads.TweenCFX.to(object2,5.0,{_x=0.7,ease=threads.TweenCFX.Ease.EaseTable[4],onCompleteScope=OnDrawFinish2,onCompleteArgs={object2,1}})
+    CreateThread(function()
+        testDrawWhile = true 
+        testDrawWhile2 = true 
+        while testDrawWhile or testDrawWhile2 do Wait(0)
+            DrawText2D(object._text,object._x,object._y,math.floor(object._alpha))
+            DrawText2D(object2._text,object2._x,object2._y,math.floor(object2._alpha))
+        end 
+    end)
+end)
+
 if GetResourceState("threads")=="started" or GetResourceState("threads")=="starting" then 
     local isClient = function() return not IsDuplicityVersion() end 
     local isServer = function() return IsDuplicityVersion() end 
