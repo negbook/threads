@@ -4,8 +4,12 @@ Threads utilities is a minority lib that makes scripts huge optimatize .
 
 # INSTALLATION
 
-Set it as a dependency in you fxmanifest.lua
+To use the API add `shared_script "@threads/threads.lua"` at the top of the `fxmanifest.lua` file in question.
+I would also suggest adding `dependency "threads"` to it aswell.
+You may now use any of the functions below, anywhere in that resource.
+
 Set debuglog = false in threads.lua if you dont want any rubbish message
+
 
 ```
 client_script '@threads/threads.lua'
