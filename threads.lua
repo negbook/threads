@@ -853,14 +853,10 @@ if GetResourceState("threads")=="started" or GetResourceState("threads")=="start
                 return exports.threads:GetDrawsTotal()
             end
         end 
+		
         if GetCurrentResourceName() == this.scriptName and not IsDuplicityVersion() then 
-            CreateThread(function()
-                while true do 
-                    RefreshWarning()
-                    Wait(60000)
-                end 
-                return
-            end)
+			threads.CreateLoop('threads:local:warning',60000,RefreshWarning)
+           
         end 
     elseif isServer() then 
     end 
